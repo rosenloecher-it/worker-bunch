@@ -6,9 +6,10 @@
 
 These rules/tasks are called "workers" here. Each worker runs as a separate thread. The
 
-Features
-- Workers listen and send MQTT messages (prepacked MQTT client)
+Features:
 - Workers listen to timer events (even with a cron syntax)
+- Workers listen and send MQTT messages (prepacked MQTT client)
+- MQTT messages get debounced. 
 - Provides a JSON schema based configuration
 - Runs as linux service.
 - Prepacked Postgres connectors.
