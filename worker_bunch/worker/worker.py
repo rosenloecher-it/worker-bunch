@@ -5,13 +5,16 @@ import threading
 from logging import Logger
 from typing import Dict, List, Optional, Set
 
-from worker_bunch.database_manager import DatabaseManager
+from worker_bunch.database.database_manager import DatabaseManager
 from worker_bunch.dispatcher import Dispatcher, DispatcherListener
-from worker_bunch.exceptions import ShutdownException
 from worker_bunch.mqtt.mqtt_proxy import MqttProxy
 from worker_bunch.service_logging import ServiceLogging
 from worker_bunch.notification import Notification
 from worker_bunch.time_utils import TimeUtils
+
+
+class ShutdownException(Exception):
+    pass
 
 
 class Worker(threading.Thread, DispatcherListener):

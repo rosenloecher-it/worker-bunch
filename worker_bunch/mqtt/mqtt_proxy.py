@@ -4,9 +4,8 @@ from typing import Dict, List, Optional, Union
 
 from paho.mqtt.client import MQTTMessage
 
-from worker_bunch.exceptions import ConfigException
 from worker_bunch.mqtt.mqtt_client import MqttClient
-
+from worker_bunch.service_config import ConfigException
 
 ProxyMessage = namedtuple("ProxyMessage", ["topic", "payload", "qos", "retain"])
 

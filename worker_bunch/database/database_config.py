@@ -1,5 +1,4 @@
 
-
 class DatabaseConfKey:
     HOST = "host"
     USER = "user"
@@ -7,9 +6,10 @@ class DatabaseConfKey:
     PASSWORD = "password"
     DATABASE = "database"
     TIMEZONE = "timezone"
+    AUTO_COMMIT = "auto-commit"
 
 
-DATABASE_JSONSCHEMA = {
+DATABASE_CONNECTION_JSONSCHEMA = {
     "type": "object",
     "properties": {
         DatabaseConfKey.HOST: {"type": "string", "minLength": 1, "description": "Database host"},
@@ -18,6 +18,7 @@ DATABASE_JSONSCHEMA = {
         DatabaseConfKey.PASSWORD: {"type": "string", "minLength": 1, "description": "Database password"},
         DatabaseConfKey.DATABASE: {"type": "string", "minLength": 1, "description": "Database name"},
         DatabaseConfKey.TIMEZONE: {"type": "string", "minLength": 1, "description": "Predefined session timezone"},
+        DatabaseConfKey.AUTO_COMMIT: {"type": "boolean"},
     },
     "additionalProperties": False,
     "required": [DatabaseConfKey.HOST, DatabaseConfKey.PORT, DatabaseConfKey.DATABASE],
@@ -26,6 +27,6 @@ DATABASE_JSONSCHEMA = {
 
 DATABASE_CONNECTIONS_JSONSCHEMA = {
     "type": "object",
-    "additionalProperties": DATABASE_JSONSCHEMA,
+    "additionalProperties": DATABASE_CONNECTION_JSONSCHEMA,
     "description": "Dictionary of <database-connection-name>:<database-connection-properties>"
 }
