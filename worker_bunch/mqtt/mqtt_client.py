@@ -166,7 +166,7 @@ class MqttClient:
             retain=retain
         )
 
-        _logger.info("sent - topic: '%s' | payload: '%s'", topic, payload)
+        _logger.debug("sent - topic: '%s' | payload: '%s'", topic, payload)
 
         return result
 

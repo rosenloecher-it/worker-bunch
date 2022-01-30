@@ -71,7 +71,7 @@ class DummyWorker(Worker):
 
         dispatcher.subscribe_mqtt_topics(self, self._mqtt_topics_in, 0.2)
 
-        self._logger.info("subscript")
+        self._logger.info("subscribe")
 
     def _work(self, notifications: List[Notification]):
         for notification in notifications:

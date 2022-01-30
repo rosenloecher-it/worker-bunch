@@ -9,8 +9,9 @@ import schedule
 from rx import operators as rx_ops
 from paho.mqtt.client import MQTTMessage
 from rx.core import Observer
+from rx.disposable import Disposable
 
-from worker_bunch.notification import Notification, NotificationType
+from worker_bunch.notification import Notification, NotificationType, NotificationBucket
 from worker_bunch.time_utils import TimeUtils
 
 
@@ -32,10 +33,8 @@ class DispatcherListener:
 class TopicMatch:
 
     topic: str
-
     search_pattern: str = None
-
-    listeners: Set[DispatcherListener] = attr.field(init=False, default=set())
+    listeners: Set[DispatcherListener] = attr.Factory(set)
 
 
 class Dispatcher:
@@ -52,7 +51,7 @@ class Dispatcher:
         self._last_cron_time = TimeUtils.now()
 
         # separation of notifications and trigger, notifications are overwritten by newer ones
-        self._notifications: Dict[DispatcherListener, Set[Notification]] = {}
+        self._notifications: Dict[DispatcherListener, NotificationBucket] = {}
 
         self._exact_topic_matches: Dict[str, TopicMatch] = {}
         self._wildcard_topic_matches: List[TopicMatch] = []
@@ -60,8 +59,21 @@ class Dispatcher:
         self._cron_subscriptions: Dict[str, TopicMatch] = {}
         self._observers: Dict[DispatcherListener, Optional[Observer]] = {}
 
+        # only simple values can be pushed through pipelines. So an "id" get pushed
+        self._observer_listener: Dict[int, DispatcherListener] = {}
+
+        self._disposables: List[Disposable] = []
+
     def close(self):
         self._shutdown = True
+
+        for observable in self._observers.values():
+            observable.on_completed()
+        self._observers = {}
+
+        for disposable in self._disposables:
+            disposable.dispose()
+        self._disposables = []
 
     def get_mqtt_topics(self) -> List[str]:
         topics = [m.topic for m in self._wildcard_topic_matches]
@@ -91,10 +103,11 @@ class Dispatcher:
                 self._exact_topic_matches[topic] = topic_match
             topic_match.listeners.add(listener)
 
-    def subscribe_mqtt_topics(self, listener: DispatcherListener, topics: List[str], debounce_time: float = DEFAULT_DEBOUNCE_TIME):
-        if listener in self._observers:
+    def subscribe_mqtt_topics(self, listener: DispatcherListener, topics: List[str],
+                              debounce_time: float = DEFAULT_DEBOUNCE_TIME) -> None:
+        if listener in self._observer_listener:
             raise RuntimeError(f"Listener ({listener.name}) has already subscribed (only one pipeline per listener)!")
-        self._observers[listener] = None
+        self._observer_listener[id(listener)] = listener
 
         for topic in topics:
             self._register_mqtt_topic(listener, topic)
@@ -105,9 +118,11 @@ class Dispatcher:
         observable = rx.create(creating_observer_callback)
 
         instance = self
-        observable.pipe(
+        disposable = observable.pipe(
             rx_ops.debounce(debounce_time)
-        ).subscribe(lambda piped_listener: instance._send_notifications(piped_listener))
+        ).subscribe(lambda listener_id: instance._send_notifications_by_id(listener_id))
+
+        self._disposables.append(disposable)
 
     def subscribe_cron(self, listener: DispatcherListener, cron: str, topic: str):
         topic_match = self._cron_subscriptions.get(cron)
@@ -160,14 +175,12 @@ class Dispatcher:
             for listener in send_to:
                 self._send_notifications(listener)
 
-    def push_messages(self, messages: List[MQTTMessage]):
+    def push_mqtt_messages(self, messages: List[MQTTMessage]):
         if self._shutdown:
             return
 
         for message in messages:
             notification = Notification.create_from_mqtt(message)
-
-            _logger.debug("push_messages: %s ", notification)
 
             listeners: Set[DispatcherListener] = set()
 
@@ -184,19 +197,22 @@ class Dispatcher:
                 self._queue_notification(listener)
 
     def _queue_notification(self, listener: DispatcherListener):
-        observer = self._observers[listener]  # must be exits
-        observer.on_next(listener)
+        observer = self._observers[listener]  # must exists
+        observer.on_next(id(listener))
 
     def _store_notification(self, listener: DispatcherListener, notification: Notification):
-        bucket: Set[Notification] = self._notifications.get(listener)
+        bucket: Optional[NotificationBucket] = self._notifications.get(listener)
         if bucket is None:
-            bucket = set()
+            bucket = NotificationBucket()
             self._notifications[listener] = bucket
-
         bucket.add(notification)
 
+    def _send_notifications_by_id(self, listener_id: int):
+        listener = self._observer_listener.get(listener_id)
+        self._send_notifications(listener)
+
     def _send_notifications(self, listener: DispatcherListener):
-        bucket: Set[Notification] = self._notifications.get(listener)
+        bucket: Optional[NotificationBucket] = self._notifications.get(listener)
         if bucket:
-            self._notifications[listener] = set()
-            listener.add_notifications(bucket)
+            listener.add_notifications(bucket.get_set())
+            bucket.clear()

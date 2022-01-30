@@ -92,7 +92,7 @@ class Runner:
             self._mqtt_proxy.publish()
 
             messages = self._mqtt_proxy.get_messages()
-            self._dispatcher.push_messages(messages)
+            self._dispatcher.push_mqtt_messages(messages)
 
             self._dispatcher.trigger_timers()
 

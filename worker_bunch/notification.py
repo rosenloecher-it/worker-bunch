@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import Dict
 
 from attr import frozen
 from paho.mqtt.client import MQTTMessage
@@ -19,7 +20,7 @@ class Notification:
     topic: str
 
     # payload is not part of key. it will be skipped if new notification for the same type an topic arrive.
-    payload: str
+    payload: str = None
 
     def __key(self):
         return self.type, self.topic
@@ -41,9 +42,47 @@ class Notification:
 
     @classmethod
     def create_from_mqtt(cls, mqtt_message: MQTTMessage):
-
         return Notification(
             type=NotificationType.MQTT_MESSAGE,
             topic=cls.ensure_string(mqtt_message.topic),
             payload=cls.ensure_string(mqtt_message.payload),
         )
+
+    @classmethod
+    def create_timer(cls, topic: str):
+        return Notification(type=NotificationType.TIMER, topic=topic)
+
+    @classmethod
+    def create_cron(cls, topic: str):
+        return Notification(type=NotificationType.CRON, topic=topic)
+
+
+class NotificationBucket:
+
+    def __init__(self):
+        self._dict: Dict[Notification, Notification] = {}
+
+    def __str__(self):
+        return '{}'.format(self._dict)
+
+    def __repr__(self) -> str:
+        return '{}({})'.format(self.__class__.__name__, self._dict)
+
+    def __bool__(self):
+        return bool(self._dict)
+
+    def __len__(self):
+        return len(self._dict)
+
+    def add(self, notification: Notification):
+        if notification:
+            self._dict[notification] = notification
+
+    def clear(self):
+        self._dict = {}
+
+    def get_list(self):
+        return list(self._dict.values())
+
+    def get_set(self):
+        return set(self._dict.values())
