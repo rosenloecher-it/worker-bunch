@@ -16,6 +16,10 @@ class TimeUtils:
         return now
 
     @classmethod
+    def diff_seconds(cls, reference: datetime.datetime):
+        return (cls.now() - reference).total_seconds()
+
+    @classmethod
     def sleep(cls, millis) -> int:
         time.sleep(millis)
         return millis

@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Dict
+from typing import Dict, List
 
 from attr import frozen
 from paho.mqtt.client import MQTTMessage
@@ -10,6 +10,9 @@ class NotificationType(Enum):
     TIMER = "TIMER"
     MQTT_MESSAGE = "MQTT_MESSAGE"
     DEBUG_SINGLE = "DEBUG_SINGLE"
+
+
+NT = NotificationType
 
 
 @frozen
@@ -56,6 +59,14 @@ class Notification:
     @classmethod
     def create_cron(cls, topic: str):
         return Notification(type=NotificationType.CRON, topic=topic)
+
+    @classmethod
+    def find(cls, notifications: List[any], type: NotificationType, topic: str = None):
+        for notification in notifications:
+            if notification.type == type and (topic is None or topic == notification.topic):
+                return True
+
+        return False
 
 
 class NotificationBucket:

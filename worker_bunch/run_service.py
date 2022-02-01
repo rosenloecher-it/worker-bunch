@@ -4,6 +4,7 @@ from typing import List, Optional
 
 import click
 from jsonschema import ValidationError
+from yaml.parser import ParserError
 
 from worker_bunch.service_config import ConfigException
 from worker_bunch.service_configurator import ServiceConfigurator
@@ -55,6 +56,7 @@ _logger = logging.getLogger(__name__)
 )
 def worker_bunch_main(config_file, json_schema, log_file, log_level, print_log_console, skip_log_times, debug_single):
     """A task/rule engine framework. It bunches a set of worker threads."""
+    config_error_code = 78  # sysexits.h: define EX_CONFIG 78 /* configuration error */
 
     try:
         if json_schema:
@@ -66,14 +68,18 @@ def worker_bunch_main(config_file, json_schema, log_file, log_level, print_log_c
         pass  # exits 0 by default
     except ConfigException as ex:
         _logger.error(ex)
-        sys.exit(78)  # sysexits.h: define EX_CONFIG 78 /* configuration error */
+        sys.exit(config_error_code)
+
+    except ParserError as ex:
+        _logger.error("parsing error in config file:\n%s", ex)
+        sys.exit(config_error_code)
     except ValidationError as ex:
         _logger.error("error in config file (see JSON schema):\n"
                       "    json-path: %s\n"
                       "    problem:   %s\n"
                       "    validator: %s (argument(s): %s)",
                       ex.json_path, ex.message, ex.validator, ex.validator_value)
-        sys.exit(78)  # sysexits.h: define EX_CONFIG 78 /* configuration error */
+        sys.exit(config_error_code)
     except Exception as ex:
         _logger.exception(ex)
         sys.exit(1)  # a simple return is not understood by click

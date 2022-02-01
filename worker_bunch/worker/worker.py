@@ -130,7 +130,7 @@ class Worker(threading.Thread, DispatcherListener):
                 self._sleep()
 
         except ShutdownException:
-            self._logger.debug('shutdown')
+            pass
         except Exception as ex:
             self._logger.exception(ex)
         finally:
