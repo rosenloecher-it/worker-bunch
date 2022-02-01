@@ -22,7 +22,7 @@ class TestTopicMatch(unittest.TestCase):
 
         self.assertEqual(t1.topic, "t1")
         self.assertEqual(t1.search_pattern, "s1")
-        self.assertEqual(t1.listeners, set([listener]))
+        self.assertEqual(t1.listeners, {listener})
 
         self.assertEqual(t2.topic, "t2")
         self.assertEqual(t2.search_pattern, None)
@@ -67,7 +67,7 @@ class TestDispatcher(unittest.TestCase):
         self.dispatcher.push_mqtt_messages(messages)
         time.sleep(0.2)
 
-        expected = set([Notification.create_from_mqtt(m_a4), Notification.create_from_mqtt(m_b2)])
+        expected = {Notification.create_from_mqtt(m_a4), Notification.create_from_mqtt(m_b2)}
         listener.add_notifications.assert_called_once_with(expected)
 
     def test_timer(self):
@@ -82,7 +82,7 @@ class TestDispatcher(unittest.TestCase):
 
         self.dispatcher.trigger_timers()
 
-        expected = set([Notification.create_timer("5-minutes")])
+        expected = {Notification.create_timer("5-minutes")}
         listener.add_notifications.assert_called_once_with(expected)
 
     @mock.patch("worker_bunch.time_utils.TimeUtils.now")
@@ -109,5 +109,5 @@ class TestDispatcher(unittest.TestCase):
         mocked_now.return_value = time_start + datetime.timedelta(seconds=65)
         self.dispatcher.trigger_timers()
 
-        expected = set([Notification.create_cron("cron-trigger")])
+        expected = {Notification.create_cron("cron-trigger")}
         listener.add_notifications.assert_called_once_with(expected)

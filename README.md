@@ -2,7 +2,7 @@
 
 ... is a task/rule engine for use in a smarthome environment.
 
-*Worker-Bunch* provides an programming infrastructure for create your own rules/tasks with your own functionality..
+*Worker-Bunch* provides a programming infrastructure for create your own rules/tasks with your own functionality.
 
 These rules/tasks are called "workers" here. Each worker runs as a separate thread. The
 
@@ -55,9 +55,9 @@ Edit your `worker-bunch.yaml`. See comments there.
 # see command line options
 ./worker-bunch.sh --help
 
-# prepare your own config file based on ./fronius-mqtt-bridge.yaml.sample
+# prepare your own config file based on ./worker-bunch.yaml.sample
 # the embedded json schema may contain additional information
-./fronius-mqtt-bridge.sh --json-schema
+./worker-bunch.sh --json-schema
 # (the JSON schema get dynamically adapted by configured workers.)
 
 # create database schema manually analog to ./scripts/*.sql or let the app do it
@@ -102,7 +102,7 @@ If no messages get logged check your broker.
 ```bash
 sudo apt-get install mosquitto-clients
 
-# preprare credentials
+# prepare credentials
 SERVER="<your server>"
 
 # start listener

@@ -146,7 +146,7 @@ def run_service(config_file, log_file, log_level, print_log_console, skip_log_ti
         workers_settings = service_config.get_worker_settings()
 
         for worker in workers:
-            # before set_mqtt_proxy (last will depends on config)!
+            # before set_mqtt_proxy ("last will" depends on config)!
             worker.set_extra_settings(workers_settings.get(worker.name))
 
             worker.set_database_manager(database_manager)

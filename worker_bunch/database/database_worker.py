@@ -37,8 +37,8 @@ class DatabaseWorker(Worker):
     def __init__(self, name: str):
         super().__init__(name)
 
-        self._connection_key: str = None
-        self._cron: str = None
+        self._connection_key: Optional[str] = None
+        self._cron: Optional[str] = None
         self._steps: List[Step] = []
 
     def set_extra_settings(self, extra_settings: Optional[Dict[str, any]]):
@@ -141,7 +141,8 @@ class DatabaseWorker(Worker):
             payload = str(list(fetched.values())[0])
             self._mqtt_proxy.queue(step.mqtt_topic, payload, step.mqtt_retain)
 
-    def _execute(self, database: DatabaseConnector, step: Step):
+    @classmethod
+    def _execute(cls, database: DatabaseConnector, step: Step):
         with database.connection.cursor() as cursor:
             cursor.execute(step.statement)
 

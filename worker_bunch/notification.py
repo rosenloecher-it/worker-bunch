@@ -23,7 +23,7 @@ class Notification:
     # contains the MQTT topic or timer key
     topic: str
 
-    # payload is not part of key. it will be skipped if new notification for the same type an topic arrive.
+    # payload is not part of key. it will be skipped if new notification for the same type a topic arrive.
     payload: str = None
 
     def __key(self):

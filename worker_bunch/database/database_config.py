@@ -67,7 +67,7 @@ DATABASE_STEP_JSONSCHEMA = {
         DatabaseConfKey.MQTT_OUTPUT_TYPE: {
             "type": "string",
             "enum": MQTT_OUTPUT_TYPES,
-            "description": "'scalar': publishes a single stringfied value; 'json': publishes JSON (first row); 'none': publishes nothing",
+            "description": "'scalar': publishes a single stringified value; 'json': publishes JSON (first row); 'none': publishes nothing",
         },
         DatabaseConfKey.MQTT_RETAIN: {"type": "boolean"},
         DatabaseConfKey.MQTT_TOPIC: {"type": "string", "minLength": 1, "description": "MQTT target topic"},
@@ -87,7 +87,7 @@ DATABASE_WORKER_JSONSCHEMA = {
     "required": [DatabaseConfKey.CONNECTION_KEY, DatabaseConfKey.CRON, DatabaseConfKey.STEPS],
     "type": "object",
     "properties": {
-        DatabaseConfKey.CONNECTION_KEY: {"type": "string", "minLength": 1, "description": "Databse connection key"},
+        DatabaseConfKey.CONNECTION_KEY: {"type": "string", "minLength": 1, "description": "Database connection key"},
         # https://stackoverflow.com/questions/14203122/create-a-regular-expression-for-cron-statement
         DatabaseConfKey.CRON: {"type": "string", "minLength": 9, "description": "CRON syntax"},
         DatabaseConfKey.STEPS: {

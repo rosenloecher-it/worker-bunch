@@ -58,7 +58,7 @@ class Dispatcher:
         self._exact_topic_matches: Dict[str, TopicMatch] = {}
         self._wildcard_topic_matches: List[TopicMatch] = []
 
-        self._timer_subscriptions: Set[DispatcherListener] = set()  # only to send SINGLE notfications
+        self._timer_subscriptions: Set[DispatcherListener] = set()  # only to send SINGLE notifications
         self._cron_subscriptions: Dict[str, TopicMatch] = {}
         self._observers: Dict[DispatcherListener, Optional[Observer]] = {}
 
