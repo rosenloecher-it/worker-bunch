@@ -54,7 +54,7 @@ _logger = logging.getLogger(__name__)
     help="Debug and run a single worker, once, single-threaded",
 )
 def worker_bunch_main(config_file, json_schema, log_file, log_level, print_log_console, skip_log_times, debug_single):
-    """A (smart)home task/rule engine where configurable workers (threads) get notified about MQTT messages or timer events."""
+    """A task/rule engine framework. It bunches a set of worker threads."""
 
     try:
         if json_schema:
@@ -66,6 +66,14 @@ def worker_bunch_main(config_file, json_schema, log_file, log_level, print_log_c
         pass  # exits 0 by default
     except ConfigException as ex:
         _logger.error(ex)
+        sys.exit(78)  # sysexits.h: define EX_CONFIG 78 /* configuration error */
+    except ValidationError as ex:
+        _logger.error("error in config file (see JSON schema):\n"
+                      "    json-path: %s\n"
+                      "    problem:   %s\n"
+                      "    validator: %s (argument(s): %s)",
+                      ex.json_path, ex.message, ex.validator, ex.validator_value)
+        sys.exit(78)  # sysexits.h: define EX_CONFIG 78 /* configuration error */
     except Exception as ex:
         _logger.exception(ex)
         sys.exit(1)  # a simple return is not understood by click
