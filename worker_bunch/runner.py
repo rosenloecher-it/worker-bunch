@@ -53,12 +53,20 @@ class Runner:
         # connect mqtt - part 1 - trigger
         self._mqtt_proxy.connect()
 
-        self._main_task = self._loop.create_task(self._main())
+        self._main_task = self._loop.create_task(self._main_loop())
 
         try:
             self._loop.run_until_complete(self._main_task)
         except asyncio.CancelledError:
             _logger.debug("canceling...")
+
+    def run_single(self):
+        # connect mqtt - part 1 - trigger
+        self._mqtt_proxy.connect()
+
+        self._main_task = self._loop.create_task(self._main_single())
+
+        self._loop.run_until_complete(self._main_task)
 
     async def _wait_for_mqtt_connection_timeout(self):
         timeout = self.TIME_LIMIT_MQTT_CONNECTION
@@ -80,7 +88,7 @@ class Runner:
 
             await asyncio.sleep(0.05)
 
-    async def _main(self):
+    async def _main_loop(self):
         await self._wait_for_mqtt_connection_timeout()
 
         last_worker_check_time = TimeUtils.now()
@@ -103,3 +111,17 @@ class Runner:
                     raise RuntimeError("Dead workers found: {}".format(", ".join(dead_workers)))
 
             await asyncio.sleep(0.05)
+
+    async def _main_single(self):
+        await self._wait_for_mqtt_connection_timeout()
+
+        await asyncio.sleep(0.2)  # wait for messages to come in
+
+        messages = self._mqtt_proxy.get_messages()
+        self._dispatcher.push_mqtt_messages(messages)
+        self._dispatcher.trigger_debug_single()
+
+        await asyncio.sleep(0.2)  # wait for debounce pipelines to finish
+
+        for worker in self._workers:
+            worker.run_single()

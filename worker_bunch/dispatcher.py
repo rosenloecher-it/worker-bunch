@@ -58,6 +58,7 @@ class Dispatcher:
         self._exact_topic_matches: Dict[str, TopicMatch] = {}
         self._wildcard_topic_matches: List[TopicMatch] = []
 
+        self._timer_subscriptions: Set[DispatcherListener] = set()  # only to send SINGLE notfications
         self._cron_subscriptions: Dict[str, TopicMatch] = {}
         self._observers: Dict[DispatcherListener, Optional[Observer]] = {}
 
@@ -158,6 +159,8 @@ class Dispatcher:
 
         timer_job.do(timer_closure)
 
+        self._timer_subscriptions.add(listener)
+
     def trigger_timers(self):
         """Triggers timer and cron notification,"""
         if self._shutdown:
@@ -180,6 +183,17 @@ class Dispatcher:
 
             for listener in send_to:
                 self._send_notifications(listener)
+
+    def trigger_debug_single(self):
+        listeners = set(list(self._timer_subscriptions))
+        for topic_match in self._cron_subscriptions.values():
+            listeners |= topic_match.listeners
+
+        notification = Notification(type=NotificationType.DEBUG_SINGLE, topic="", payload=None)
+
+        for listener in list(listeners):
+            self._store_notification(listener, notification)
+            self._send_notifications(listener)
 
     def push_mqtt_messages(self, messages: List[MQTTMessage]):
         if self._shutdown:

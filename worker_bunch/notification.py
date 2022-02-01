@@ -9,6 +9,7 @@ class NotificationType(Enum):
     CRON = "CRON"
     TIMER = "TIMER"
     MQTT_MESSAGE = "MQTT_MESSAGE"
+    DEBUG_SINGLE = "DEBUG_SINGLE"
 
 
 @frozen

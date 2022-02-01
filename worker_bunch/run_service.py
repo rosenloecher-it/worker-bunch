@@ -5,6 +5,7 @@ from typing import List, Optional
 import click
 from jsonschema import ValidationError
 
+from worker_bunch.service_config import ConfigException
 from worker_bunch.service_configurator import ServiceConfigurator
 from worker_bunch.service_logging import LOGGING_CHOICES, ServiceLogging
 from worker_bunch.database.database_manager import DatabaseManager
@@ -21,13 +22,13 @@ _logger = logging.getLogger(__name__)
 
 @click.command()
 @click.option(
+    "--config-file",
+    help="Config file",
+)
+@click.option(
     "--json-schema",
     is_flag=True,
     help="Prints the config file JSON schema and exits."
-)
-@click.option(
-    "--config-file",
-    help="Config file",
 )
 @click.option(
     "--log-file",
@@ -48,18 +49,23 @@ _logger = logging.getLogger(__name__)
     is_flag=True,
     help="Skip log timestamp (systemd/journald logs get their own timestamp)."
 )
-def worker_bunch_main(config_file, json_schema, log_file, log_level, print_log_console, skip_log_times):
+@click.option(
+    "--debug-single",
+    help="Debug and run a single worker, once, single-threaded",
+)
+def worker_bunch_main(config_file, json_schema, log_file, log_level, print_log_console, skip_log_times, debug_single):
     """A (smart)home task/rule engine where configurable workers (threads) get notified about MQTT messages or timer events."""
 
     try:
         if json_schema:
             print_json_schema(config_file)
         else:
-            run_service(config_file, log_file, log_level, print_log_console, skip_log_times)
+            run_service(config_file, log_file, log_level, print_log_console, skip_log_times, debug_single)
 
     except KeyboardInterrupt:
         pass  # exits 0 by default
-
+    except ConfigException as ex:
+        _logger.error(ex)
     except Exception as ex:
         _logger.exception(ex)
         sys.exit(1)  # a simple return is not understood by click
@@ -84,7 +90,7 @@ def _shutdown_workers(workers: List[Worker]):
             break
 
 
-def run_service(config_file, log_file, log_level, print_log_console, skip_log_times):
+def run_service(config_file, log_file, log_level, print_log_console, skip_log_times, debug_single):
     dispatcher: Optional[Dispatcher] = None
     mqtt_client: Optional[MqttClient] = None
     mqtt_proxy: Optional[MqttProxy] = None
@@ -103,10 +109,17 @@ def run_service(config_file, log_file, log_level, print_log_console, skip_log_ti
 
         worker_instances_config = service_config.get_worker_instances_config()
         worker_dict = WorkerFactory.create_workers(worker_instances_config)
-        workers = list(worker_dict.values())
         workers_settings_declarations = WorkerFactory.extract_workers_settings_declarations(worker_dict)
 
         service_config.revalidate_worker_extra_settings(workers_settings_declarations)
+
+        if debug_single:
+            single_worker = worker_dict.get(debug_single)
+            if not single_worker:
+                raise ConfigException(f"single-run ({debug_single}) does not exist!")
+            worker_dict = {debug_single: single_worker}
+
+        workers = list(worker_dict.values())
 
         # bootstrapping
         dispatcher = Dispatcher()
@@ -128,7 +141,10 @@ def run_service(config_file, log_file, log_level, print_log_console, skip_log_ti
 
         # start
         runner = Runner(dispatcher, mqtt_proxy, workers)
-        runner.run()
+        if debug_single:
+            runner.run_single()
+        else:
+            runner.run()
 
     finally:
         _logger.info("shutdown")
