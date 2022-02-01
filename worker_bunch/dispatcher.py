@@ -50,6 +50,8 @@ class Dispatcher:
 
         self._last_cron_time = TimeUtils.now()
 
+        self._max_debounce_time = 0
+
         # separation of notifications and trigger, notifications are overwritten by newer ones
         self._notifications: Dict[DispatcherListener, NotificationBucket] = {}
 
@@ -59,7 +61,7 @@ class Dispatcher:
         self._cron_subscriptions: Dict[str, TopicMatch] = {}
         self._observers: Dict[DispatcherListener, Optional[Observer]] = {}
 
-        # only simple values can be pushed through pipelines. So an "id" get pushed
+        # only simple values can be pushed through pipelines. So an "listener-id" instead if the listener reference gets pushed.
         self._observer_listener: Dict[int, DispatcherListener] = {}
 
         self._disposables: List[Disposable] = []
@@ -70,6 +72,9 @@ class Dispatcher:
         for observable in self._observers.values():
             observable.on_completed()
         self._observers = {}
+
+        wait_for_emptied_queues = min(self._max_debounce_time + 0.05, 1.0)
+        TimeUtils.sleep(wait_for_emptied_queues)
 
         for disposable in self._disposables:
             disposable.dispose()
@@ -109,6 +114,8 @@ class Dispatcher:
             raise RuntimeError(f"Listener ({listener.name}) has already subscribed (only one pipeline per listener)!")
         self._observer_listener[id(listener)] = listener
 
+        self._max_debounce_time = max(self._max_debounce_time, debounce_time)
+
         for topic in topics:
             self._register_mqtt_topic(listener, topic)
 
@@ -133,7 +140,6 @@ class Dispatcher:
 
     def subscribe_timer(self, listener: DispatcherListener, timer_job: schedule.Job, topic: str):
         """
-
         :param listener:
         :param timer_job:
         :param topic:
