@@ -47,8 +47,7 @@ class ServiceConfigurator:
                 if extra_config.required:
                     settings_required.append(worker_name)
 
-        schema[MainConfKey.WORKER_SETTINGS] = worker_settings_schema
-
+        schema["properties"][MainConfKey.WORKER_SETTINGS] = worker_settings_schema
         return schema
 
     def revalidate_worker_extra_settings(self, declarations: Dict[str, WorkerSettingsDeclaration]):
