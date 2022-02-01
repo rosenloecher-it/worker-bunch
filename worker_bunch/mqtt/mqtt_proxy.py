@@ -7,7 +7,7 @@ from paho.mqtt.client import MQTTMessage
 from worker_bunch.mqtt.mqtt_client import MqttClient
 from worker_bunch.service_config import ConfigException
 
-ProxyMessage = namedtuple("ProxyMessage", ["topic", "payload", "qos", "retain"])
+ProxyMessage = namedtuple("ProxyMessage", ["topic", "payload", "retain"])
 
 
 class MqttProxy:
@@ -35,13 +35,13 @@ class MqttProxy:
             else:
                 return True  # hide missing mqtt client
 
-    def set_last_will(self, topic: str, last_will: Union[str, Dict], retain: Optional[bool] = None, qos: Optional[int] = None):
+    def set_last_will(self, topic: str, last_will: Union[str, Dict], retain: Optional[bool] = None):
         if not self._mqtt_client:
             raise ConfigException("no mqtt client configured!")
 
         with self._lock:
             if self._mqtt_client and topic and last_will:
-                self._mqtt_client.set_last_will(topic=topic, last_will=last_will, retain=retain, qos=qos)
+                self._mqtt_client.set_last_will(topic=topic, last_will=last_will, retain=retain)
 
     def subscribe(self, topics: List[str]):
         if topics:
@@ -58,12 +58,12 @@ class MqttProxy:
             else:
                 return []
 
-    def queue(self, topic: str, payload: Union[str, Dict], retain: Optional[bool] = None, qos: Optional[int] = None):
+    def queue(self, topic: str, payload: Union[str, Dict], retain: Optional[bool] = None):
         if not self._mqtt_client:
             raise ConfigException("no mqtt client configured!")
 
         with self._lock:
-            self._messages.append(ProxyMessage(topic=topic, payload=payload, retain=retain, qos=qos))
+            self._messages.append(ProxyMessage(topic=topic, payload=payload, retain=retain))
 
     def publish(self):
         if self._mqtt_client:
@@ -73,4 +73,4 @@ class MqttProxy:
                     self._messages = []
 
                     for m in messages:
-                        self._mqtt_client.publish(topic=m.topic, payload=m.payload, retain=m.retain, qos=m.qos)
+                        self._mqtt_client.publish(topic=m.topic, payload=m.payload, retain=m.retain)
