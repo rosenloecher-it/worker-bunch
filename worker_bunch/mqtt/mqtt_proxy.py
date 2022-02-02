@@ -1,3 +1,4 @@
+import json
 import threading
 from collections import namedtuple
 from typing import Dict, List, Optional, Union
@@ -73,4 +74,7 @@ class MqttProxy:
                     self._messages = []
 
                     for m in messages:
-                        self._mqtt_client.publish(topic=m.topic, payload=m.payload, retain=m.retain)
+                        payload = m.payload
+                        if isinstance(payload, dict):
+                            payload = json.dumps(payload, sort_keys=True)
+                        self._mqtt_client.publish(topic=m.topic, payload=payload, retain=m.retain)

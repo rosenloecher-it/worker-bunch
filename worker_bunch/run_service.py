@@ -1,3 +1,4 @@
+import json
 import logging
 import sys
 from typing import List, Optional
@@ -11,7 +12,7 @@ from worker_bunch.service_configurator import ServiceConfigurator
 from worker_bunch.service_logging import LOGGING_CHOICES, ServiceLogging
 from worker_bunch.database.database_manager import DatabaseManager
 from worker_bunch.dispatcher import Dispatcher
-from worker_bunch.mqtt.mqtt_client import MqttClient
+from worker_bunch.mqtt.mqtt_client import MqttClient, MqttClientFactory
 from worker_bunch.mqtt.mqtt_proxy import MqttProxy
 from worker_bunch.runner import Runner
 from worker_bunch.time_utils import TimeUtils
@@ -60,7 +61,8 @@ def worker_bunch_main(config_file, json_schema, log_file, log_level, print_log_c
 
     try:
         if json_schema:
-            print_json_schema(config_file)
+            output = generate_json_schema_info(config_file)
+            print(output)
         else:
             run_service(config_file, log_file, log_level, print_log_console, skip_log_times, test_single)
 
@@ -140,7 +142,7 @@ def run_service(config_file, log_file, log_level, print_log_console, skip_log_ti
         database_manager = DatabaseManager(service_config.get_database_config())
 
         mqtt_config = service_config.get_mqtt_config()
-        mqtt_client = MqttClient(mqtt_config) if mqtt_config else None
+        mqtt_client = MqttClientFactory.create(mqtt_config) if mqtt_config else None
         mqtt_proxy = MqttProxy(mqtt_client)
 
         workers_settings = service_config.get_worker_settings()
@@ -184,28 +186,41 @@ def run_service(config_file, log_file, log_level, print_log_console, skip_log_ti
                 _logger.exception(ex)
 
 
-def print_json_schema(config_file: str):
+def generate_json_schema_info(config_file: Optional[str]) -> str:
+    text_blocks = []
+
+    def append_text(text_block):
+        text_blocks.append(text_block)
+
+    def append_schema(text_block):
+        text_blocks.append(json.dumps(text_block, indent=4, sort_keys=True))
+
     try:
         if not config_file:
-            print("The JSON schema output is supposed to contain also the worker extra settings, but therefore it needs a specific "
-                  "configuration. So please provide the configuration file.\n")
-            ServiceConfigurator.print_config_file_json_schema(None)
-            return
+            append_text(
+                "The JSON schema output is supposed to contain also the worker extra settings, but therefore it needs a specific "
+                "configuration. So please provide the configuration file.\n"
+            )
+            append_schema(ServiceConfigurator.generate_config_file_json_schema(None))
+        else:
+            service_config = ServiceConfigurator()
+            service_config.read_config_file(config_file, skip_file_access_check=True)
 
-        service_config = ServiceConfigurator()
-        service_config.read_config_file(config_file, skip_file_access_check=True)
+            worker_instances_config = service_config.get_worker_instances_config()
+            workers = WorkerFactory.create_workers(worker_instances_config)
+            workers_extra_configs = WorkerFactory.extract_workers_settings_declarations(workers)
 
-        worker_instances_config = service_config.get_worker_instances_config()
-        workers = WorkerFactory.create_workers(worker_instances_config)
-        workers_extra_configs = WorkerFactory.extract_workers_settings_declarations(workers)
-
-        ServiceConfigurator.print_config_file_json_schema(workers_extra_configs)
+            append_schema(ServiceConfigurator.generate_config_file_json_schema(workers_extra_configs))
 
     except ValidationError as ex:
-        print("The JSON schema output is supposed to contain also the worker extra settings, but that is only possible "
-              "if the base settings can be read flawlessly. Actually there is a problem reading the config file, so only "
-              "the base JSON schema is shown.\n\nActual problem: {}\n".format(str(ex.message)))
-        ServiceConfigurator.print_config_file_json_schema(None)
+        append_text(
+            "The JSON schema output is supposed to contain also the worker extra settings, but that is only possible "
+            "if the base settings can be read flawlessly. Actually there is a problem reading the config file, so only "
+            "the base JSON schema is shown.\n\nActual problem: {}\n".format(str(ex.message))
+        )
+        append_schema(ServiceConfigurator.generate_config_file_json_schema(None))
+
+    return "\n".join(text_blocks)
 
 
 if __name__ == '__main__':

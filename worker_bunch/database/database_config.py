@@ -88,7 +88,7 @@ DATABASE_WORKER_JSONSCHEMA = {
     "type": "object",
     "properties": {
         DatabaseConfKey.CONNECTION_KEY: {"type": "string", "minLength": 1, "description": "Database connection key"},
-        # https://stackoverflow.com/questions/14203122/create-a-regular-expression-for-cron-statement
+        # TODO https://stackoverflow.com/questions/14203122/create-a-regular-expression-for-cron-statement
         DatabaseConfKey.CRON: {"type": "string", "minLength": 9, "description": "CRON syntax"},
         DatabaseConfKey.STEPS: {
             "type": "array",

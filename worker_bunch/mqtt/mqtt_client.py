@@ -215,3 +215,11 @@ class MqttClient:
 
     def _on_publish(self, mqtt_client, userdata, mid):
         """MQTT callback is invoked when message was successfully sent to the MQTT server."""
+
+
+class MqttClientFactory:
+    """purpose: patch MqttClient within tests..."""
+
+    @classmethod
+    def create(cls, config):
+        return MqttClient(config)

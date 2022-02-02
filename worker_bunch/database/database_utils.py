@@ -4,7 +4,7 @@ import os
 class DatabaseUtils:
 
     @classmethod
-    def load_as_single_command(cls, file: str) -> str:
+    def load_script_file(cls, file: str) -> str:
         """Loads commands from a file"""
 
         if not os.path.isfile(file):
@@ -13,4 +13,4 @@ class DatabaseUtils:
         with open(file) as f:
             lines = f.readlines()
 
-        return "\n".join(lines)
+        return "".join(lines)

@@ -37,6 +37,7 @@ class TestDispatcher(unittest.TestCase):
     def tearDown(self):
         self.dispatcher.close()
 
+    # noinspection PyTypeChecker
     def test_get_mqtt_topics(self):
         self.dispatcher.subscribe_mqtt_topics(mock.MagicMock(DispatcherListener), ["test/a", "test/#"], 0.1)
         self.dispatcher.subscribe_mqtt_topics(mock.MagicMock(DispatcherListener), ["test/a", "test/#", "test/b"], 0.1)
@@ -45,6 +46,7 @@ class TestDispatcher(unittest.TestCase):
         topics.sort()
         self.assertEqual(topics, ["test/#", "test/a", "test/b"])
 
+    # noinspection PyTypeChecker
     def test_mqtt_messages(self):
         listener = mock.MagicMock(DispatcherListener)
         listener.add_notifications = mock.MagicMock("add_notifications")
@@ -85,6 +87,7 @@ class TestDispatcher(unittest.TestCase):
         expected = {Notification.create_timer("5-minutes")}
         listener.add_notifications.assert_called_once_with(expected)
 
+    # noinspection PyTypeChecker
     @mock.patch("worker_bunch.time_utils.TimeUtils.now")
     def test_cron(self, mocked_now):
         time_start = datetime.datetime(2022, 1, 30, 10, 0, 0, tzinfo=get_localzone())

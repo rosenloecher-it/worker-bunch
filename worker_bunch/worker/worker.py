@@ -115,10 +115,6 @@ class Worker(threading.Thread, DispatcherListener):
             self._notifications.clear()
             return notifications
 
-    def _reset_notifications(self):
-        with self._lock:
-            return self._notifications.clear()
-
     def _should_handle_pending_notifications(self) -> bool:
         with self._lock:
             return bool(self._notifications)
@@ -142,7 +138,7 @@ class Worker(threading.Thread, DispatcherListener):
                 self._process_notifications()
 
         except ShutdownException:
-            self._logger.debug('shutdown')
+            pass
         except Exception as ex:
             self._logger.exception(ex)
         finally:

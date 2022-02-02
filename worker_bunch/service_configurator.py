@@ -1,5 +1,4 @@
 import copy
-import json
 import os
 from typing import Dict, Optional
 
@@ -80,11 +79,9 @@ class ServiceConfigurator:
             raise PermissionError(f"wrong config file permissions ({config_file}: expected 600, got {permissions})! {extra}")
 
     @classmethod
-    def print_config_file_json_schema(cls, workers_extra_configs: Optional[Dict[str, WorkerSettingsDeclaration]]):
-
+    def generate_config_file_json_schema(cls, workers_extra_configs: Optional[Dict[str, WorkerSettingsDeclaration]]):
         if workers_extra_configs:
             schema = cls.create_extended_json_schema(workers_extra_configs)
         else:
             schema = CONFIG_JSONSCHEMA
-
-        print(json.dumps(schema, indent=4, sort_keys=True))
+        return schema

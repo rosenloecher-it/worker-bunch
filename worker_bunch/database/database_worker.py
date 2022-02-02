@@ -109,13 +109,15 @@ class DatabaseWorker(Worker):
                 time_diff = TimeUtils.diff_seconds(time_start)
                 time_sum += time_diff
                 if self._logger.isEnabledFor(logging.DEBUG):
-                    self._logger.debug("[%d]: statement:\n%s", index, step.statement)
-                if 1 == len(self._steps):
-                    times_log = f"{time_diff:.1f}s"
-                else:
-                    times_log += f"[{index}]: {time_diff:.1f}s; "
+                    self._logger.debug("[%d]: execute statement:\n%s", index, step.statement)
+                if time_diff > 0.1:
+                    if 1 == len(self._steps):
+                        times_log = f"{time_diff:.1f}s"
+                    else:
+                        times_log += f"[{index}]: {time_diff:.1f}s; "
 
-            times_log += f"sum: {time_sum:.1f}s"
+            if 1 < len(self._steps):
+                times_log += f"sum: {time_sum:.1f}s"
             self._logger.info("took: %s", times_log)
 
     def _final_work(self):
@@ -169,7 +171,7 @@ class DatabaseWorker(Worker):
                 return
 
             try:
-                step.statement = DatabaseUtils.load_as_single_command(step.script_file)
+                step.statement = DatabaseUtils.load_script_file(step.script_file)
             except IOError as ex:
                 push_error(f"[{index}]: script file ({step.script_file}) cannot be read! {str(ex)}")
 
