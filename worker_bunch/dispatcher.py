@@ -184,12 +184,12 @@ class Dispatcher:
             for listener in send_to:
                 self._send_notifications(listener)
 
-    def trigger_debug_single(self):
+    def trigger_test_single(self):
         listeners = set(list(self._timer_subscriptions))
         for topic_match in self._cron_subscriptions.values():
             listeners |= topic_match.listeners
 
-        notification = Notification(type=NotificationType.DEBUG_SINGLE, topic="", payload=None)
+        notification = Notification(type=NotificationType.TEST_SINGLE, topic="", payload=None)
 
         for listener in list(listeners):
             self._store_notification(listener, notification)

@@ -119,7 +119,7 @@ class Runner:
 
         messages = self._mqtt_proxy.get_messages()
         self._dispatcher.push_mqtt_messages(messages)
-        self._dispatcher.trigger_debug_single()
+        self._dispatcher.trigger_test_single()
 
         await asyncio.sleep(0.2)  # wait for debounce pipelines to finish
 

@@ -51,10 +51,10 @@ _logger = logging.getLogger(__name__)
     help="Skip log timestamp (systemd/journald logs get their own timestamp)."
 )
 @click.option(
-    "--debug-single",
-    help="Debug and run a single worker, once, single-threaded",
+    "--test-single",
+    help="Test/debug/run a single worker, once, single-threaded...",
 )
-def worker_bunch_main(config_file, json_schema, log_file, log_level, print_log_console, skip_log_times, debug_single):
+def worker_bunch_main(config_file, json_schema, log_file, log_level, print_log_console, skip_log_times, test_single):
     """A task/rule engine framework. It bunches a set of worker threads."""
     config_error_code = 78  # sysexits.h: define EX_CONFIG 78 /* configuration error */
 
@@ -62,7 +62,7 @@ def worker_bunch_main(config_file, json_schema, log_file, log_level, print_log_c
         if json_schema:
             print_json_schema(config_file)
         else:
-            run_service(config_file, log_file, log_level, print_log_console, skip_log_times, debug_single)
+            run_service(config_file, log_file, log_level, print_log_console, skip_log_times, test_single)
 
     except KeyboardInterrupt:
         pass  # exits 0 by default
@@ -104,7 +104,7 @@ def _shutdown_workers(workers: List[Worker]):
             break
 
 
-def run_service(config_file, log_file, log_level, print_log_console, skip_log_times, debug_single):
+def run_service(config_file, log_file, log_level, print_log_console, skip_log_times, test_single):
     dispatcher: Optional[Dispatcher] = None
     mqtt_client: Optional[MqttClient] = None
     mqtt_proxy: Optional[MqttProxy] = None
@@ -127,11 +127,11 @@ def run_service(config_file, log_file, log_level, print_log_console, skip_log_ti
 
         service_config.revalidate_worker_extra_settings(workers_settings_declarations)
 
-        if debug_single:
-            single_worker = worker_dict.get(debug_single)
+        if test_single:
+            single_worker = worker_dict.get(test_single)
             if not single_worker:
-                raise ConfigException(f"single-run ({debug_single}) does not exist!")
-            worker_dict = {debug_single: single_worker}
+                raise ConfigException(f"single-run ({test_single}) does not exist!")
+            worker_dict = {test_single: single_worker}
 
         workers = list(worker_dict.values())
 
@@ -155,7 +155,7 @@ def run_service(config_file, log_file, log_level, print_log_console, skip_log_ti
 
         # start
         runner = Runner(dispatcher, mqtt_proxy, workers)
-        if debug_single:
+        if test_single:
             runner.run_single()
         else:
             runner.run()
