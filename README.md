@@ -1,18 +1,26 @@
 # Worker-Bunch
 
-... is a task/rule engine for use in a smarthome environment.
+... is a tasks/jobs/rules engine for use in a smarthome environment.
 
-*Worker-Bunch* provides a programming infrastructure for create your own rules/tasks with your own functionality.
+*Worker-Bunch* provides a programming infrastructure for creating tasks/jobs/rules with proprietary functionality.
+These tasks/jobs/rules are called "workers" here. Each worker runs as a separate thread.
 
-These rules/tasks are called "workers" here. Each worker runs as a separate thread. The
+The worker base class is supposed to get overwritten. The most functionality goes into 2 functions with limited scope: 
+`subscribe_notifications` and `_work`. See [dummy_worker](./app/dummy_worker.py) and [main](./app/main.py).
 
-Features:
-- Workers listen to timer events (even with a cron syntax)
-- Workers listen and send MQTT messages (prepacked MQTT client)
-- MQTT messages get debounced. 
-- Provides a JSON schema based configuration
-- Runs as linux service.
-- Prepacked Postgres connectors.
+The following infrastructure is already implemented:
+- Starting and stopping the worker
+- Logging
+- Configuration and validation of configuration file (extendable for your job configuration; JSON schema based)
+- Subscriptions to timer and cron events.
+- Subscriptions to MQTT topics and publish MQTT messages. MQTT messages get debounced (configurable time span). 
+
+Other characteristics:
+- Runs as Linux service.
+- Additional prepacked is a Postgres and MQTT client. 
+  This is a quite opinionated decision due to the special lifecycle of the MQTT client (among others).  
+- Ready to use is a database worker, which is fully configurable (cron, sql statements, sql scripts, text replacements). 
+  See [database_worker](./worker_bunch/database/database_worker.py).
 
 
 ## Startup
@@ -74,7 +82,7 @@ Edit your `worker-bunch.yaml`. See comments there.
 # prepare your own service script based on worker-bunch.service.sample
 cp ./worker-bunch.service.sample ./worker-bunch.service
 
-# edit/adapt pathes and user in worker-bunch.service
+# edit/adapt paths and user in worker-bunch.service
 vi ./worker-bunch.service
 
 # install service
