@@ -6,7 +6,9 @@
 These tasks/jobs/rules are called "workers" here. Each worker runs as a separate thread.
 
 The worker base class is supposed to get overwritten. The most functionality goes into 2 functions with limited scope:
-`subscribe_notifications` and `_work`. See [dummy_worker](./app/dummy_worker.py) and [main](./app/main.py).
+`subscribe_notifications` and `_work`. See
+[dummy_worker.py](https://github.com/rosenloecher-it/worker-bunch/blob/master/app/dummy_worker.py) and
+[main.py](https://github.com/rosenloecher-it/worker-bunch/blob/master/app/main.py).
 
 The following infrastructure parts are already implemented:
 - Starting and stopping the workers
@@ -21,7 +23,7 @@ Other characteristics:
 - Additional prepacked is a Postgres and MQTT client.
   This is a quite opinionated decision due to the special lifecycle of the MQTT client (among others).
 - Ready to use is a database worker, which is fully configurable (cron, sql statements, sql scripts, text replacements).
-  See [database_worker](./worker_bunch/database/database_worker.py).
+  See [database_worker](https://github.com/rosenloecher-it/worker-bunch/blob/master/worker_bunch/database/database_worker.py).
 
 
 ## Usage
