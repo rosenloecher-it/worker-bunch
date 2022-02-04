@@ -13,9 +13,10 @@ __work__/
 .idea/
 
 # setuptools
-/dist/
-/*.egg-info
 /*.egg
+/*.egg-info
+/build/
+/dist/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

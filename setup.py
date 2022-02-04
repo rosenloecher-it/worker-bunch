@@ -11,7 +11,7 @@ with codecs.open(os.path.join(here, "README.md"), encoding="utf-8") as fh:
 install_requires = [i.strip() for i in open("requirements.txt").readlines()]
 
 VERSION = '0.1.0'
-DESCRIPTION = 'Streaming video data via networks'
+DESCRIPTION = 'Tasks/jobs/rules engine, primarily intended for use in a smarthome environment.'
 
 # Setting up
 setup(
