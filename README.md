@@ -1,127 +1,32 @@
 # Worker-Bunch
 
-... is a tasks/jobs/rules engine for use in a smarthome environment.
+... is a tasks/jobs/rules engine, primarily intended for use in a smarthome environment.
 
 *Worker-Bunch* provides a programming infrastructure for creating tasks/jobs/rules with proprietary functionality.
 These tasks/jobs/rules are called "workers" here. Each worker runs as a separate thread.
 
-The worker base class is supposed to get overwritten. The most functionality goes into 2 functions with limited scope: 
+The worker base class is supposed to get overwritten. The most functionality goes into 2 functions with limited scope:
 `subscribe_notifications` and `_work`. See [dummy_worker](./app/dummy_worker.py) and [main](./app/main.py).
 
-The following infrastructure is already implemented:
-- Starting and stopping the worker
+The following infrastructure parts are already implemented:
+- Starting and stopping the workers
 - Logging
 - Configuration and validation of configuration file (extendable for your job configuration; JSON schema based)
 - Subscriptions to timer and cron events.
-- Subscriptions to MQTT topics and publish MQTT messages. MQTT messages get debounced (configurable time span). 
+- Subscriptions to MQTT topics and publish MQTT messages. MQTT messages get debounced (configurable time span).
+- Command line arguments
 
 Other characteristics:
 - Runs as Linux service.
-- Additional prepacked is a Postgres and MQTT client. 
-  This is a quite opinionated decision due to the special lifecycle of the MQTT client (among others).  
-- Ready to use is a database worker, which is fully configurable (cron, sql statements, sql scripts, text replacements). 
+- Additional prepacked is a Postgres and MQTT client.
+  This is a quite opinionated decision due to the special lifecycle of the MQTT client (among others).
+- Ready to use is a database worker, which is fully configurable (cron, sql statements, sql scripts, text replacements).
   See [database_worker](./worker_bunch/database/database_worker.py).
 
 
-## Startup
+## Usage
 
-### Prepare python environment
-```bash
-cd /opt
-sudo mkdir worker-bunch
-sudo chown <user>:<user> worker-bunch  # type in your user
-git clone https://github.com/rosenloecher-it/worker-bunch worker-bunch
-
-cd worker-bunch
-virtualenv -p /usr/bin/python3 venv
-
-# activate venv
-source ./venv/bin/activate
-
-# check python version >= 3.8
-python --version
-
-# install required packages
-pip install -r requirements.txt
-```
-
-### Configuration
-
-```bash
-# cd ... goto project dir
-cp ./worker-bunch.yaml.sample ./worker-bunch.yaml
-
-# security concerns: make sure, no one can read the stored passwords
-chmod 600 ./worker-bunch.yaml
-```
-
-Edit your `worker-bunch.yaml`. See comments there.
-
-### Run
-
-```bash
-# see command line options
-./worker-bunch.sh --help
-
-# prepare your own config file based on ./worker-bunch.yaml.sample
-# the embedded json schema may contain additional information
-./worker-bunch.sh --json-schema
-# (the JSON schema get dynamically adapted by configured workers.)
-
-# create database schema manually analog to ./scripts/*.sql or let the app do it
-./worker-bunch.sh --create --print-logs --config-file ./worker-bunch.yaml
-
-# start the logger
-./worker-bunch.sh --print-logs --config-file ./worker-bunch.yaml
-# abort with ctrl+c
-
-```
-
-## Register as systemd service
-```bash
-# prepare your own service script based on worker-bunch.service.sample
-cp ./worker-bunch.service.sample ./worker-bunch.service
-
-# edit/adapt paths and user in worker-bunch.service
-vi ./worker-bunch.service
-
-# install service
-sudo cp ./worker-bunch.service /etc/systemd/system/
-# alternativ: sudo cp ./worker-bunch.service.sample /etc/systemd/system//worker-bunch.service
-# after changes
-sudo systemctl daemon-reload
-
-# start service
-sudo systemctl start worker-bunch
-
-# check logs
-journalctl -u worker-bunch
-journalctl -u worker-bunch --no-pager --since "5 minutes ago"
-
-# enable autostart at boot time
-sudo systemctl enable worker-bunch.service
-```
-
-## Additional infos
-
-### MQTT broker related infos
-
-If no messages get logged check your broker.
-```bash
-sudo apt-get install mosquitto-clients
-
-# prepare credentials
-SERVER="<your server>"
-
-# start listener
-mosquitto_sub -h $SERVER -d -t smarthome/#
-
-# send single message
-mosquitto_pub -h $SERVER -d -t smarthome/test -m "test_$(date)"
-
-# just as info: clear retained messages
-mosquitto_pub -h $SERVER -d -t smarthome/test -n -r -d
-```
+Have a look at  [Worker-Bunch-Sample](https://github.com/rosenloecher-it/worker-bunch-sample)
 
 
 ## Maintainer & License

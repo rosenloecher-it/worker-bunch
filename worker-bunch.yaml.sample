@@ -1,0 +1,30 @@
+logging:
+    file:                       "./__test__/mqtt-logs.log"
+    level:                      "debug"  # debug, info, warning, error
+    print_console:              true
+    skip_times:                 false
+    module_levels:
+        "schedule":             "info"
+
+mqtt_broker:
+    host:                       "<host>"
+    port:                       1883
+    protocol:                   4  # 3==MQTTv31 (default), 4==MQTTv311, 5==default/MQTTv5,
+
+# database_connections:
+#     main-database:
+#         host:                 "<host>"
+#         port:                 5435
+#         user:                 "<schema user>"
+#         password:             "<password>"
+#         database:             "<database>"
+
+worker_instances:
+    DummyWorker:                "app.dummy_worker.DummyWorker"
+
+worker_settings:
+    DummyWorker:
+        mqtt_last_will:         "last_will!"
+        mqtt_topic_out:         "test/worker-bunch/dummy"
+        mqtt_topics_in:         ["smarthome/device1/#", "smarthome/device2/state"]
+
