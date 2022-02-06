@@ -12,6 +12,7 @@ from test.setup_test import SetupTest
 from worker_bunch.database.database_config import DatabaseConfKey, MqttOutputType
 from worker_bunch.mqtt.mqtt_client import MqttClient, MqttClientFactory
 from worker_bunch.run_service import run_service
+from worker_bunch.service_config import ConfigException
 
 
 class MockMqttClientFactory:
@@ -134,18 +135,31 @@ class TestIntegrationScalar(BaseTestIntegration):
 
 
 class TestIntegrationJson(BaseTestIntegration):
+    """Test JSON + script file"""
 
-    def create_steps(self):
-        return [{
+    def setUp(self):
+        statement = "SELECT '{%a%}' as a, '{%b%}' as b"
+        script_file = SetupTest.get_test_path("integration_template_file.sql")
+        with open(script_file, 'w') as f:
+            f.write(statement)
+
+        self.steps = [{
             DatabaseConfKey.MQTT_LAST_WILL: DatabaseConfKey.MQTT_LAST_WILL,
             DatabaseConfKey.MQTT_OUTPUT_TYPE: MqttOutputType.JSON,
             DatabaseConfKey.MQTT_TOPIC: DatabaseConfKey.MQTT_TOPIC,
             DatabaseConfKey.REPLACEMENTS: {"{%a%}": "a_step"},
-            DatabaseConfKey.STATEMENT: "SELECT '{%a%}' as a, '{%b%}' as b",
+            DatabaseConfKey.SCRIPT_FILE: script_file,
         }]
 
+        self.worker_replacements = {"{%a%}": "a_worker", "{%b%}": "b_worker"}
+
+        super().setUp()
+
+    def create_steps(self):
+        return self.steps
+
     def create_worker_replacements(self):
-        return {"{%a%}": "a_worker", "{%b%}": "b_worker"}
+        return self.worker_replacements
 
     @mock.patch.object(MqttClientFactory, "create", MockMqttClientFactory.create)
     def test_full_integration_json(self):
@@ -163,6 +177,31 @@ class TestIntegrationJson(BaseTestIntegration):
             call(topic=DatabaseConfKey.MQTT_TOPIC, payload=DatabaseConfKey.MQTT_LAST_WILL, retain=False),
         ]
         mocked_mqtt_client.publish.assert_has_calls(calls)
+
+
+class TestIntegrationFileNotFount(BaseTestIntegration):
+    """Test JSON + script file"""
+
+    def setUp(self):
+        self.script_file = SetupTest.get_test_path("integration_template_file.sql")
+        if os.path.exists(self.script_file):
+            os.remove(self.script_file)
+
+        self.steps = [{
+            DatabaseConfKey.MQTT_OUTPUT_TYPE: MqttOutputType.JSON,
+            DatabaseConfKey.MQTT_TOPIC: DatabaseConfKey.MQTT_TOPIC,
+            DatabaseConfKey.SCRIPT_FILE: self.script_file,
+        }]
+
+        super().setUp()
+
+    def create_steps(self):
+        return self.steps
+
+    @mock.patch.object(MqttClientFactory, "create", MockMqttClientFactory.create)
+    def test_full_integration_json(self):
+        with self.assertRaises(ConfigException):
+            self.run_service_single_mode(self._config_file)
 
 
 class TestIntegrationExecute(BaseTestIntegration):

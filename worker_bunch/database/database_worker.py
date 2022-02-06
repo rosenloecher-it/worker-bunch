@@ -56,8 +56,8 @@ class DatabaseWorker(Worker):
 
         def push_error(message: str):
             nonlocal found_config_error
-            self._logger.error("config issue " + message)
-            found_config_error = False
+            self._logger.error("config issue - step" + message)
+            found_config_error = True
 
         for index, config_step in enumerate(config_steps):
             step = self.create_step(config_step)
@@ -111,7 +111,8 @@ class DatabaseWorker(Worker):
                 time_diff = TimeUtils.diff_seconds(time_start)
                 time_sum += time_diff
                 if self._logger.isEnabledFor(logging.DEBUG):
-                    self._logger.debug("[%d]: execute statement:\n%s", index, step.statement)
+                    output_type = f" ({step.mqtt_output_type})" if step.mqtt_output_type else ""
+                    self._logger.debug("[%d]: executed statement%s:\n%s", index, output_type, step.statement)
                 if time_diff > 0.1:
                     if 1 == len(self._steps):
                         times_log = f"{time_diff:.1f}s"
@@ -159,7 +160,7 @@ class DatabaseWorker(Worker):
             step.mqtt_output_type = None
         step.mqtt_retain = bool(step.mqtt_retain)
 
-        if not step.mqtt_topic and (step.mqtt_last_will or not step.mqtt_output_type):
+        if not step.mqtt_topic and (step.mqtt_last_will or step.mqtt_output_type):
             push_error(f"[{index}]: missing mqtt topic!")
 
         self.prepare_step_statement(step, index, push_error)
