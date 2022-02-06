@@ -75,7 +75,7 @@ DATABASE_STEP_JSONSCHEMA = {
         DatabaseConfKey.STATEMENT: {"type": "string", "minLength": 1, "description": "SQL statement"},
         DatabaseConfKey.REPLACEMENTS: {
             "additionalProperties": {"type": "string"},
-            "description": "Key/value pairs: replace all occurrences of the key with the value.",
+            "description": "Key/value pairs: replace all occurrences of the key with the value within statement.",
             "type": "object",
         },
     },
@@ -90,6 +90,12 @@ DATABASE_WORKER_JSONSCHEMA = {
         DatabaseConfKey.CONNECTION_KEY: {"type": "string", "minLength": 1, "description": "Database connection key"},
         # TODO https://stackoverflow.com/questions/14203122/create-a-regular-expression-for-cron-statement
         DatabaseConfKey.CRON: {"type": "string", "minLength": 9, "description": "CRON syntax"},
+        DatabaseConfKey.REPLACEMENTS: {
+            "additionalProperties": {"type": "string"},
+            "description": "Key/value pairs: Worker wide configuration. May be overwritten by steps. "
+                           "Replace all occurrences of the key with the value within statements.",
+            "type": "object",
+        },
         DatabaseConfKey.STEPS: {
             "type": "array",
             "items": DATABASE_STEP_JSONSCHEMA,

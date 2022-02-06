@@ -30,7 +30,7 @@ _logger = logging.getLogger(__name__)
 @click.option(
     "--json-schema",
     is_flag=True,
-    help="Prints the config file JSON schema and exits."
+    help="Prints the config file JSON schema and exits. (JSON schema is used to validate the YAML config.)"
 )
 @click.option(
     "--log-file",

@@ -40,12 +40,14 @@ class DatabaseWorker(Worker):
         self._connection_key: Optional[str] = None
         self._cron: Optional[str] = None
         self._steps: List[Step] = []
+        self._replacements: Dict[str, str] = {}
 
     def set_extra_settings(self, extra_settings: Optional[Dict[str, any]]):
         super().set_extra_settings(extra_settings)
 
         self._connection_key = self._extra_settings[DatabaseConfKey.CONNECTION_KEY]
         self._cron = self._extra_settings[DatabaseConfKey.CRON]
+        self._replacements = self._extra_settings.get(DatabaseConfKey.REPLACEMENTS, {})
 
         self._steps = []
         config_steps = self._extra_settings[DatabaseConfKey.STEPS]
@@ -152,8 +154,7 @@ class DatabaseWorker(Worker):
     def create_step(cls, config_step: Dict[str, any]) -> Step:
         return Step(**config_step)
 
-    @classmethod
-    def prepare_step(cls, step: Step, index: int, push_error: Callable):
+    def prepare_step(self, step: Step, index: int, push_error: Callable):
         if step.mqtt_output_type == MqttOutputType.NONE or not step.mqtt_output_type:
             step.mqtt_output_type = None
         step.mqtt_retain = bool(step.mqtt_retain)
@@ -161,10 +162,9 @@ class DatabaseWorker(Worker):
         if not step.mqtt_topic and (step.mqtt_last_will or not step.mqtt_output_type):
             push_error(f"[{index}]: missing mqtt topic!")
 
-        cls.prepare_step_statement(step, index, push_error)
+        self.prepare_step_statement(step, index, push_error)
 
-    @classmethod
-    def prepare_step_statement(cls, step: Step, index: int, push_error: Callable):
+    def prepare_step_statement(self, step: Step, index: int, push_error: Callable):
         if not step.statement:  # must be from file
             if not os.path.isfile(step.script_file):
                 push_error(f"[{index}]: script file ({step.script_file}) not found!")
@@ -175,7 +175,8 @@ class DatabaseWorker(Worker):
             except IOError as ex:
                 push_error(f"[{index}]: script file ({step.script_file}) cannot be read! {str(ex)}")
 
-        for pattern, replacement in step.replacements.items():
+        replacements = {**self._replacements, **step.replacements}
+        for pattern, replacement in replacements.items():
             step.statement = step.statement.replace(pattern, replacement)
 
         step.statement = step.statement.strip()
