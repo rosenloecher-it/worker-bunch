@@ -25,6 +25,9 @@ class TimeUtils:
         return millis
 
     @classmethod
-    def cron_trigger(cls, cron: str, since: datetime.datetime, now: datetime.datetime = None):
+    def is_cron_time(cls, cron: str, now: datetime.datetime = None):
+        """
+        Returns True is the cron is triggering right `now`
+        """
         now = now if now is not None else cls.now()
-        return pycron.has_been(cron, since, now)
+        return pycron.is_now(cron, now)

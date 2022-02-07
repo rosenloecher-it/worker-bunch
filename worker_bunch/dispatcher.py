@@ -2,7 +2,6 @@ import abc
 import logging
 from typing import Dict, List, Optional, Set
 
-import pycron
 import rx
 import attr
 import schedule
@@ -172,9 +171,8 @@ class Dispatcher:
 
         if self._last_cron_time < now:  # next minute
             send_to: Set[DispatcherListener] = set()
-
             for cron, topic_match in self._cron_subscriptions.items():
-                if pycron.has_been(cron, self._last_cron_time, now):
+                if TimeUtils.is_cron_time(cron, now):
                     notification = Notification(type=NotificationType.CRON, topic=topic_match.topic, payload=None)
                     for listener in topic_match.listeners:
                         self._store_notification(listener, notification)
