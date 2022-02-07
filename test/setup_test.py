@@ -5,6 +5,7 @@ import sys
 from typing import List, Optional
 
 import psycopg
+# noinspection PyPackageRequirements
 import testing.postgresql
 from psycopg.rows import dict_row
 
@@ -16,6 +17,7 @@ class SetupTestException(Exception):
 _logger = logging.getLogger(__name__)
 
 
+# noinspection SpellCheckingInspection
 class SetupTest:
 
     TEST_DIR = "__test__"

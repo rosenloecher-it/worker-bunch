@@ -61,9 +61,9 @@ class Notification:
         return Notification(type=NotificationType.CRON, topic=topic)
 
     @classmethod
-    def find(cls, notifications: List[any], type: NotificationType, topic: str = None):
+    def find(cls, notifications: List[any], ntype: NotificationType, topic: str = None):
         for notification in notifications:
-            if notification.type == type and (topic is None or topic == notification.topic):
+            if notification.type == ntype and (topic is None or topic == notification.topic):
                 return True
 
         return False

@@ -41,6 +41,7 @@ LOGGING_JSONSCHEMA = {
 }
 
 
+# noinspection SpellCheckingInspection
 class ServiceLogging:
 
     @classmethod

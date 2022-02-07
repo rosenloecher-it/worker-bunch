@@ -57,6 +57,7 @@ _logger = logging.getLogger(__name__)
 )
 def worker_bunch_main(config_file, json_schema, log_file, log_level, print_log_console, skip_log_times, test_single):
     """A task/rule engine framework. It bunches a set of worker threads."""
+    # noinspection SpellCheckingInspection
     config_error_code = 78  # sysexits.h: define EX_CONFIG 78 /* configuration error */
 
     try:
