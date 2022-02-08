@@ -11,6 +11,7 @@ from rx.core import Observer
 from rx.disposable import Disposable
 
 from worker_bunch.notification import Notification, NotificationType, NotificationBucket
+from worker_bunch.service_config import ConfigException
 from worker_bunch.time_utils import TimeUtils
 
 
@@ -132,6 +133,11 @@ class Dispatcher:
         self._disposables.append(disposable)
 
     def subscribe_cron(self, listener: DispatcherListener, cron: str, topic: str):
+        try:
+            TimeUtils.is_cron_time(cron)  # result down not matter here, just fail immediately
+        except ValueError as ex:
+            raise ConfigException(f"wrong cron format (cron: '{cron}'; worker: {listener.name}): {str(ex)}!")
+
         topic_match = self._cron_subscriptions.get(cron)
         if topic_match is None:
             topic_match = TopicMatch(topic=topic)
