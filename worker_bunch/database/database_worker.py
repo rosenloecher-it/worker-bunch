@@ -113,14 +113,10 @@ class DatabaseWorker(Worker):
                 if self._logger.isEnabledFor(logging.DEBUG):
                     output_type = f" ({step.mqtt_output_type})" if step.mqtt_output_type else ""
                     self._logger.debug("[%d]: executed statement%s:\n%s", index, output_type, step.statement)
-                if time_diff > 0.1:
-                    if 1 == len(self._steps):
-                        times_log = f"{time_diff:.1f}s"
-                    else:
-                        times_log += f"[{index}]: {time_diff:.1f}s; "
+                if time_diff > 0.2 and 1 < len(self._steps):
+                    times_log += f"[{index}]={time_diff:.1f}s; "
 
-            if 1 < len(self._steps):
-                times_log += f"sum: {time_sum:.1f}s"
+            times_log += f"sum={time_sum:.1f}s"
             self._logger.info("took: %s", times_log)
 
     def _final_work(self):
