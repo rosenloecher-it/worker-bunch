@@ -179,7 +179,7 @@ class TestIntegrationJson(BaseTestIntegration):
         mocked_mqtt_client.publish.assert_has_calls(calls)
 
 
-class TestIntegrationFileNotFount(BaseTestIntegration):
+class TestIntegrationFileNotFound(BaseTestIntegration):
     """Test JSON + script file"""
 
     def setUp(self):
