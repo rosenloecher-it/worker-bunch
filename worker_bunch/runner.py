@@ -15,16 +15,6 @@ _logger = logging.getLogger(__name__)
 
 class Runner:
 
-    DEFAULT_DELIVERY_TIME_QUICK = 10
-    DEFAULT_DELIVERY_TIME_MEDIUM = 60
-    DEFAULT_DELIVERY_TIME_SLOW = 300
-    DEFAULT_FETCH_TIMEOUT = 10
-
-    ROUND_FLOAT = 7
-
-    JSON_STATUS = "status"
-    JSON_TIMESTAMP = "timestamp"
-
     TIME_LIMIT_MQTT_CONNECTION = 10  # seconds
 
     def __init__(self, dispatcher: Dispatcher, mqtt_proxy: MqttProxy, workers: List[Worker]):

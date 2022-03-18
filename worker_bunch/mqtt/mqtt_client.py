@@ -90,30 +90,6 @@ class MqttClient:
         self._client.loop_start()
         _logger.debug("%s is connecting...", self.__class__.__name__)
 
-        #         subscriptions = config.get(MqttConfKey.SUBSCRIPTIONS)
-        #         self._subscriptions = self.list_to_set(subscriptions)
-        #         if not self._subscriptions:
-        #             self._subscribed = True
-
-    # def _try_to_subscribe(self) -> bool:
-    #     """wait for getting mqtt connect callback called"""
-    #     if not self._subscribed and self._is_connected:
-    #         with self._lock:
-    #             channels = [c for c in self._subscriptions]
-    #         if channels:
-    #             subs_qos = 1  # qos for subscriptions, not used, but necessary
-    #             subscriptions = [(s, subs_qos) for s in channels]
-    #             result, dummy = self._client.subscribe(subscriptions)
-    #             if result != mqtt.MQTT_ERR_SUCCESS:
-    #                 error_info = "{} (#{})".format(mqtt.error_string(result), result)
-    #                 raise MqttException(f"could not subscribe to MQTT topics): {error_info}; topics: {channels}")
-    #
-    #             self._subscribed = True
-    #             LifecycleControl.notify(StatusNotification.MQTT_LISTENER_SUBSCRIBED)
-    #             _logger.info("subscribed to MQTT topics (%s)", channels)
-    #
-    #     return self._subscribed
-
     def close(self):
         self._shutdown = True
         if self._client is not None:
@@ -150,11 +126,11 @@ class MqttClient:
         if self._shutdown:
             return
 
-        retain = self._default_retain if retain is None else retain
-        qos = self._default_qos if qos is None else qos
-
         if not self.is_connected():
             raise MqttException(self._disconnected_error_info or "MQTT is not connected!")
+
+        retain = self._default_retain if retain is None else retain
+        qos = self._default_qos if qos is None else qos
 
         if isinstance(payload, dict):
             payload = json.dumps(payload, sort_keys=True)

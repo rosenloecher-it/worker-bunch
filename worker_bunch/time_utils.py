@@ -20,9 +20,9 @@ class TimeUtils:
         return (cls.now() - reference).total_seconds()
 
     @classmethod
-    def sleep(cls, millis) -> int:
-        time.sleep(millis)
-        return millis
+    def sleep(cls, seconds: float) -> int:
+        time.sleep(seconds)
+        return seconds
 
     @classmethod
     def is_cron_time(cls, cron: str, now: datetime.datetime = None):
