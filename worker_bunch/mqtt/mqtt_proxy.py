@@ -1,3 +1,4 @@
+import datetime
 import json
 import threading
 from collections import namedtuple
@@ -59,9 +60,20 @@ class MqttProxy:
             else:
                 return []
 
+    @classmethod
+    def default_json_serial(cls, obj):
+        """JSON serializer for objects not serializable by default json code"""
+        if isinstance(obj, (datetime.datetime, datetime.date)):
+            return obj.isoformat()
+
+        raise TypeError(f"Type '{type(obj)}' is not JSON serializable!")
+
     def queue(self, topic: str, payload: Union[str, Dict], retain: Optional[bool] = None):
         if not self._mqtt_client:
             raise ConfigException("no mqtt client configured!")
+
+        if isinstance(payload, dict):
+            payload = json.dumps(payload, sort_keys=True, default=self.default_json_serial)
 
         with self._lock:
             self._messages.append(ProxyMessage(topic=topic, payload=payload, retain=retain))
@@ -72,9 +84,5 @@ class MqttProxy:
                 if self._mqtt_client:
                     messages = self._messages
                     self._messages = []
-
                     for m in messages:
-                        payload = m.payload
-                        if isinstance(payload, dict):
-                            payload = json.dumps(payload, sort_keys=True)
-                        self._mqtt_client.publish(topic=m.topic, payload=payload, retain=m.retain)
+                        self._mqtt_client.publish(topic=m.topic, payload=m.payload, retain=m.retain)
