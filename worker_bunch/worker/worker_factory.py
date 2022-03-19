@@ -6,6 +6,11 @@ from worker_bunch.worker.worker_config import WorkerSettingsDeclaration
 
 class WorkerFactory:
 
+    PREDEFINED_WORKERS = {
+        "AstralTimesPublisher": "worker_bunch.astral_times.astral_times_publisher.AstralTimesPublisher",
+        "DatabaseWorker": "worker_bunch.database.database_worker.DatabaseWorker",
+    }
+
     @classmethod
     def _check_class(cls, candidate):
         if not isinstance(candidate, Worker):
@@ -38,6 +43,11 @@ class WorkerFactory:
     def create_workers(cls, config) -> Dict[str, Worker]:
         workers = {}
         for worker_name, class_path in config.items():
+
+            predefinded_class_pathes = cls.PREDEFINED_WORKERS.get(class_path)
+            if predefinded_class_pathes:
+                class_path = predefinded_class_pathes
+
             if worker_name and class_path:
                 workers[worker_name] = cls.create_worker(worker_name, class_path)
         return workers
