@@ -13,13 +13,13 @@ class TestTimeUtils(unittest.TestCase):
 
         t = datetime.datetime(2022, 1, 30, 10, 0, 30, tzinfo=get_localzone())
 
-        self.assertFalse(TimeUtils.is_cron_time(cron, t))
-        self.assertFalse(TimeUtils.is_cron_time(cron, t.replace(minute=1)))
-        self.assertFalse(TimeUtils.is_cron_time(cron, t.replace(minute=3)))
-        self.assertFalse(TimeUtils.is_cron_time(cron, t.replace(minute=4)))
+        self.assertFalse(TimeUtils.hits_cron_time(cron, t))
+        self.assertFalse(TimeUtils.hits_cron_time(cron, t.replace(minute=1)))
+        self.assertFalse(TimeUtils.hits_cron_time(cron, t.replace(minute=3)))
+        self.assertFalse(TimeUtils.hits_cron_time(cron, t.replace(minute=4)))
 
-        self.assertTrue(TimeUtils.is_cron_time(cron, t.replace(minute=2)))
-        self.assertTrue(TimeUtils.is_cron_time(cron, t.replace(minute=2, second=0)))
+        self.assertTrue(TimeUtils.hits_cron_time(cron, t.replace(minute=2)))
+        self.assertTrue(TimeUtils.hits_cron_time(cron, t.replace(minute=2, second=0)))
 
     def test_is_cron_time_per_minute(self):
         cron = "*/5 * * * *"
@@ -27,7 +27,7 @@ class TestTimeUtils(unittest.TestCase):
 
         count = 0
         for i in range(0, 60):
-            if TimeUtils.is_cron_time(cron, t.replace(minute=i)):
+            if TimeUtils.hits_cron_time(cron, t.replace(minute=i)):
                 count += 1
 
         self.assertEqual(count, 12)
@@ -38,7 +38,7 @@ class TestTimeUtils(unittest.TestCase):
 
         count = 0
         for i in range(0, 24):
-            if TimeUtils.is_cron_time(cron, t.replace(hour=i)):
+            if TimeUtils.hits_cron_time(cron, t.replace(hour=i)):
                 count += 1
 
         self.assertEqual(count, 6)
@@ -49,7 +49,7 @@ class TestTimeUtils(unittest.TestCase):
 
         count = 0
         for i in range(0, 24):
-            if TimeUtils.is_cron_time(cron, t.replace(hour=i)):
+            if TimeUtils.hits_cron_time(cron, t.replace(hour=i)):
                 count += 1
 
         self.assertEqual(count, 6)

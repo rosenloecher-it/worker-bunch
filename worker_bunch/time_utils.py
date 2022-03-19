@@ -25,7 +25,7 @@ class TimeUtils:
         return seconds
 
     @classmethod
-    def is_cron_time(cls, cron: str, now: datetime.datetime = None):
+    def hits_cron_time(cls, cron: str, now: datetime.datetime = None):
         """
         Returns True is the cron is triggering right `now`
         """
