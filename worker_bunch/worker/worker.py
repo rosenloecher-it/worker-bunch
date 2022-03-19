@@ -25,13 +25,13 @@ class Worker(threading.Thread, DispatcherListener):
         self._lock = threading.Lock()
         self._closing = False  # shutdown in process
 
-        self.__logger = None  # type: Optional[Logger]
+        self.__logger: Optional[Logger] = None
 
-        self._notifications = set()  # type: Set[Notification]
+        self._notifications: Set[Notification] = set()
 
-        self._database_manager = None  # type: Optional[DatabaseManager]
-        self._extra_settings = {}  # type: Dict[str, any]
-        self._mqtt_proxy = None
+        self._database_manager: Optional[DatabaseManager] = None
+        self._extra_settings: Dict[str, any] = {}
+        self._mqtt_proxy: Optional[MqttProxy] = None
 
     def __str__(self):
         return '{}({})'.format(self.__class__.__name__, self.name)

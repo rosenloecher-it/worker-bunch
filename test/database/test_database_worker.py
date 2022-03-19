@@ -23,9 +23,3 @@ class TestStep(unittest.TestCase):
         for key, value in config.items():
             self.assertTrue(hasattr(step, key))
             self.assertEqual(getattr(step, key), value)
-
-
-class TestDatabaseWorker(unittest.TestCase):
-
-    def test_create_from_dict(self):
-        pass

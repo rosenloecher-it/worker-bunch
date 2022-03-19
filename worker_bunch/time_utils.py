@@ -38,7 +38,7 @@ class TimeUtils:
         Checks if the string is a proper cron syntax
         """
         try:
-            cls.hits_cron_time(cron)  # result down not matter here, just fail immediately
+            cls.hits_cron_time(cron)  # result down not matter here
             return True
         except ValueError:
             return False
