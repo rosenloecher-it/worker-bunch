@@ -1,3 +1,4 @@
+from worker_bunch.astral_times.astral_times_config import ASTRAL_TIMES_JSONSCHEMA
 from worker_bunch.service_logging import LOGGING_JSONSCHEMA
 from worker_bunch.database.database_config import DATABASE_CONNECTIONS_JSONSCHEMA
 from worker_bunch.mqtt.mqtt_config import MQTT_JSONSCHEMA
@@ -9,6 +10,7 @@ class ConfigException(Exception):
 
 
 class MainConfKey:
+    ASTRAL_TIMES = "astral_times"
     DATABASE_CONNECTIONS = "database_connections"
     LOGGING = "logging"
     MQTT_BROKER = "mqtt_broker"
@@ -20,6 +22,7 @@ class MainConfKey:
 CONFIG_JSONSCHEMA = {
     "type": "object",
     "properties": {
+        MainConfKey.ASTRAL_TIMES: ASTRAL_TIMES_JSONSCHEMA,
         MainConfKey.DATABASE_CONNECTIONS: DATABASE_CONNECTIONS_JSONSCHEMA,
         MainConfKey.LOGGING: LOGGING_JSONSCHEMA,
         MainConfKey.MQTT_BROKER: MQTT_JSONSCHEMA,

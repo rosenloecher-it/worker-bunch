@@ -7,6 +7,7 @@ import click
 from jsonschema import ValidationError
 from yaml.parser import ParserError
 
+from worker_bunch.astral_times.astral_times_manager import AstralTimesManager
 from worker_bunch.service_config import ConfigException
 from worker_bunch.service_configurator import ServiceConfigurator
 from worker_bunch.service_logging import LOGGING_CHOICES, ServiceLogging
@@ -139,7 +140,8 @@ def run_service(config_file, log_file, log_level, print_log_console, skip_log_ti
         workers = list(worker_dict.values())
 
         # bootstrapping
-        dispatcher = Dispatcher()
+        astral_time_manager = AstralTimesManager(service_config.get_astral_config())
+        dispatcher = Dispatcher(astral_time_manager)
         database_manager = DatabaseManager(service_config.get_database_config())
 
         mqtt_config = service_config.get_mqtt_config()

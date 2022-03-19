@@ -65,6 +65,9 @@ class ServiceConfigurator:
     def get_mqtt_config(self):
         return self._config_data.get(MainConfKey.MQTT_BROKER, {})
 
+    def get_astral_config(self):
+        return self._config_data.get(MainConfKey.ASTRAL_TIMES, {})
+
     def get_database_config(self):
         return self._config_data.get(MainConfKey.DATABASE_CONNECTIONS, {})
 

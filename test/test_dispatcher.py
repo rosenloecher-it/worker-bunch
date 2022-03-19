@@ -32,7 +32,7 @@ class TestTopicMatch(unittest.TestCase):
 class TestDispatcher(unittest.TestCase):
 
     def setUp(self):
-        self.dispatcher = Dispatcher()
+        self.dispatcher = Dispatcher(mock.MagicMock("AstralTimeManager"))
 
     def tearDown(self):
         self.dispatcher.close()
@@ -92,7 +92,7 @@ class TestDispatcher(unittest.TestCase):
     def test_cron(self, mocked_now):
         time_start = datetime.datetime(2022, 1, 30, 10, 0, 0, tzinfo=get_localzone())
 
-        self.dispatcher._last_cron_time = time_start
+        self.dispatcher._last_timer_execution = time_start
 
         mocked_now.return_value = time_start
 

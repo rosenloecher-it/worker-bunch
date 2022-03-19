@@ -82,7 +82,7 @@ class DatabaseWorker(Worker):
         dispatcher.subscribe_cron(self, self._cron, self.CRON_TOPIC)
 
     def _work(self, notifications: List[Notification]):
-        if not Notification.find(notifications, NT.CRON) and not Notification.find(notifications, NT.TEST_SINGLE):
+        if not Notification.find(notifications, NT.CRON) and not Notification.find(notifications, NT.JUST_STARTED):
             return
 
         times_log = ""

@@ -10,6 +10,7 @@ from paho.mqtt.client import MQTTMessage
 from rx.core import Observer
 from rx.disposable import Disposable
 
+from worker_bunch.astral_times.astral_times_manager import AstralTimesManager
 from worker_bunch.notification import Notification, NotificationType, NotificationBucket
 from worker_bunch.service_config import ConfigException
 from worker_bunch.time_utils import TimeUtils
@@ -44,11 +45,13 @@ class Dispatcher:
 
     DEFAULT_DEBOUNCE_TIME = 0.1
 
-    def __init__(self):
+    def __init__(self, astral_time_manager: AstralTimesManager):
+
+        self._astral_time_manager = astral_time_manager
 
         self._shutdown = False
 
-        self._last_cron_time = TimeUtils.now()
+        self._last_timer_execution = TimeUtils.now().replace(second=0, microsecond=0)
 
         self._max_debounce_time = 0
 
@@ -58,6 +61,7 @@ class Dispatcher:
         self._exact_topic_matches: Dict[str, TopicMatch] = {}
         self._wildcard_topic_matches: List[TopicMatch] = []
 
+        self._astral_subscriptions: Dict[str, TopicMatch] = {}
         self._timer_subscriptions: Set[DispatcherListener] = set()  # only to send SINGLE notifications
         self._cron_subscriptions: Dict[str, TopicMatch] = {}
         self._observers: Dict[DispatcherListener, Optional[Observer]] = {}
@@ -80,6 +84,9 @@ class Dispatcher:
         for disposable in self._disposables:
             disposable.dispose()
         self._disposables = []
+
+    def get_astral_time_manager(self) -> AstralTimesManager:
+        return self._astral_time_manager
 
     def get_mqtt_topics(self) -> List[str]:
         topics = [m.topic for m in self._wildcard_topic_matches]
@@ -132,9 +139,19 @@ class Dispatcher:
 
         self._disposables.append(disposable)
 
+    def subscribe_astral_times(self, listener: DispatcherListener, astral_key: str):
+        if not self._astral_time_manager.is_valid_astral_time_key(astral_key):
+            raise ConfigException(f"wrong astral format ('{astral_key}'; worker: {listener.name})!")
+
+        topic_match = self._astral_subscriptions.get(astral_key)
+        if topic_match is None:
+            topic_match = TopicMatch(topic=astral_key)
+            self._astral_subscriptions[astral_key] = topic_match
+        topic_match.listeners.add(listener)
+
     def subscribe_cron(self, listener: DispatcherListener, cron: str, topic: str):
         try:
-            TimeUtils.is_cron_time(cron)  # result down not matter here, just fail immediately
+            TimeUtils.hits_cron_time(cron)  # result down not matter here, just fail immediately
         except ValueError as ex:
             raise ConfigException(f"wrong cron format (cron: '{cron}'; worker: {listener.name}): {str(ex)}!")
 
@@ -175,25 +192,34 @@ class Dispatcher:
 
         now = TimeUtils.now().replace(second=0, microsecond=0)
 
-        if self._last_cron_time < now:  # next minute
+        if self._last_timer_execution < now:  # next minute
+            self._last_timer_execution = now
             send_to: Set[DispatcherListener] = set()
+
             for cron, topic_match in self._cron_subscriptions.items():
-                if TimeUtils.is_cron_time(cron, now):
+                if TimeUtils.hits_cron_time(cron, now):
                     notification = Notification(type=NotificationType.CRON, topic=topic_match.topic, payload=None)
                     for listener in topic_match.listeners:
                         self._store_notification(listener, notification)
                         send_to.add(listener)
-            self._last_cron_time = now
+
+            for astral_key, topic_match in self._astral_subscriptions.items():
+                if self._astral_time_manager.hits(astral_key, now):
+                    notification = Notification(type=NotificationType.ASTRAL, topic=topic_match.topic, payload=None)
+                    for listener in topic_match.listeners:
+                        self._store_notification(listener, notification)
+                        send_to.add(listener)
 
             for listener in send_to:
                 self._send_notifications(listener)
 
-    def trigger_test_single(self):
+    def trigger_just_started(self):
+        """Send a message to all workers, that we just started"""
         listeners = set(list(self._timer_subscriptions))
         for topic_match in self._cron_subscriptions.values():
             listeners |= topic_match.listeners
 
-        notification = Notification(type=NotificationType.TEST_SINGLE, topic="", payload=None)
+        notification = Notification(type=NotificationType.JUST_STARTED, topic="", payload=None)
 
         for listener in list(listeners):
             self._store_notification(listener, notification)

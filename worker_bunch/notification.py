@@ -6,10 +6,13 @@ from paho.mqtt.client import MQTTMessage
 
 
 class NotificationType(Enum):
+    """means MESSAGE*"""
+
+    ASTRAL = "ASTRAL"
     CRON = "CRON"
-    TIMER = "TIMER"
+    JUST_STARTED = "JUST_STARTED"
     MQTT_MESSAGE = "MQTT_MESSAGE"
-    TEST_SINGLE = "TEST_SINGLE"
+    TIMER = "TIMER"
 
 
 NT = NotificationType
@@ -51,6 +54,10 @@ class Notification:
             topic=cls.ensure_string(mqtt_message.topic),
             payload=cls.ensure_string(mqtt_message.payload),
         )
+
+    @classmethod
+    def create_astral(cls, topic: str):
+        return Notification(type=NotificationType.ASTRAL, topic=topic)
 
     @classmethod
     def create_timer(cls, topic: str):
