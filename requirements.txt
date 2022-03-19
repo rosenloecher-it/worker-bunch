@@ -1,8 +1,9 @@
+astral == 2.2
 attrs == 21.4.0
-click == 8.0.3
+click == 8.0.4
 jsonschema == 4.4.0
 paho-mqtt == 1.6.1
-psycopg == 3.0.8
+psycopg == 3.0.10
 pycron == 3.0.0
 pyyaml == 6.0
 rx == 3.2.0
