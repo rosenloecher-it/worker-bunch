@@ -31,3 +31,14 @@ class TimeUtils:
         """
         now = now if now is not None else cls.now()
         return pycron.is_now(cron, now)
+
+    @classmethod
+    def is_cron_time_syntax(cls, cron: str):
+        """
+        Checks if the string is a proper cron syntax
+        """
+        try:
+            cls.hits_cron_time(cron)  # result down not matter here, just fail immediately
+            return True
+        except ValueError:
+            return False
