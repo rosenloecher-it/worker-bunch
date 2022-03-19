@@ -120,7 +120,20 @@ class ServiceLogging:
 
     @classmethod
     def get_log_name(cls, instance_class, instance_name):
+        class_name = instance_class.__class__.__name__
 
+        # logname ist used for config handling, which ist all lower case
+        if instance_name:
+            instance_name = instance_name.lower()
+
+        if instance_name and instance_name != class_name.lower() and instance_name != class_name.lower():
+            log_name = f"{instance_class.__class__.__name__}({instance_name})"
+        else:
+            log_name = class_name
+        return log_name
+
+    @classmethod
+    def get_full_log_name(cls, instance_class, instance_name):
         class_path = instance_class.__module__
         class_name = instance_class.__class__.__name__
         class_full = "{}.{}".format(class_path, class_name)
@@ -130,7 +143,7 @@ class ServiceLogging:
             instance_name = instance_name.lower()
 
         if instance_name and instance_name != class_name.lower() and instance_name != class_full.lower():
-            log_name = "{}.{}({})".format(class_path, instance_class.__class__.__name__, instance_name)
+            log_name = f"{class_path}.{instance_class.__class__.__name__}({instance_name})"
         else:
             log_name = class_full
         return log_name
