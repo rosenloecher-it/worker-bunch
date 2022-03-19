@@ -49,8 +49,6 @@ class AstralTimesManager:
     API: https://astral.readthedocs.io/en/stable/index.html
     """
 
-    RECALC_SPAN = 3600  # seconds
-
     def __init__(self, config):
         self._observer: Optional[astral.Observer] = None
         if config:
@@ -66,10 +64,10 @@ class AstralTimesManager:
 
     def _reset_cache(self, cache_time):
         self._cached_values = {}
-        self._cache_time = cache_time
+        self._cache_time = self.round_time_to_hour(cache_time)
 
     def _get_or_calc_astral_time(self, astral_key: str, pivot_time: datetime.datetime):
-        if (pivot_time - self._cache_time).seconds > self.RECALC_SPAN:  # no matter, what is later
+        if self._cache_time != self.round_time_to_hour(pivot_time):
             self._reset_cache(pivot_time)
         astral_time = self._cached_values.get(astral_key)
         if astral_time is None:
@@ -136,6 +134,12 @@ class AstralTimesManager:
         time = time + datetime.timedelta(seconds=30)
         time = time.replace(second=0)
         time = time.replace(microsecond=0)
+        return time
+
+    @classmethod
+    def round_time_to_hour(cls, time: datetime.datetime) -> datetime.datetime:
+        time = cls.round_time_to_minute(time)
+        time = time.replace(minute=0)
         return time
 
     @classmethod

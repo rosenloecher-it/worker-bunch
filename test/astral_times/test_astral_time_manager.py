@@ -126,7 +126,7 @@ class TestAstralTimeManager(unittest.TestCase):
         self.assertEqual(hit, True)
         self.assertEqual(len(m._cached_values), 2)
 
-        # times differ more than AstralTimeManager.RECALC_SPAN
+        # another hour => cache ist reset
         hit = m.hits("       Sunrise ", t_no_hit)
         self.assertEqual(hit, False)
         self.assertEqual(len(m._cached_values), 1)  # cache was reset
