@@ -139,13 +139,21 @@ class Dispatcher:
 
         self._disposables.append(disposable)
 
-    def subscribe_astral_times(self, listener: DispatcherListener, astral_key: str):
+    def subscribe_astral_or_cron(self, listener: DispatcherListener, astral_or_cron: str, topic: str):
+        if self._astral_time_manager.is_valid_astral_time_key(astral_or_cron):
+            self.subscribe_astral_times(listener, astral_or_cron, topic)
+        elif TimeUtils.is_cron_time_syntax(astral_or_cron):
+            self.subscribe_cron(listener, astral_or_cron, topic)
+        else:
+            raise ConfigException(f"No astral nor cron format ('{astral_or_cron}'; worker: {listener.name})!")
+
+    def subscribe_astral_times(self, listener: DispatcherListener, astral_key: str, topic: str):
         if not self._astral_time_manager.is_valid_astral_time_key(astral_key):
             raise ConfigException(f"wrong astral format ('{astral_key}'; worker: {listener.name})!")
 
         topic_match = self._astral_subscriptions.get(astral_key)
         if topic_match is None:
-            topic_match = TopicMatch(topic=astral_key)
+            topic_match = TopicMatch(topic=topic)
             self._astral_subscriptions[astral_key] = topic_match
         topic_match.listeners.add(listener)
 
@@ -213,12 +221,8 @@ class Dispatcher:
             for listener in send_to:
                 self._send_notifications(listener)
 
-    def trigger_just_started(self):
-        """Send a message to all workers, that we just started"""
-        listeners = set(list(self._timer_subscriptions))
-        for topic_match in self._cron_subscriptions.values():
-            listeners |= topic_match.listeners
-
+    def trigger_just_started(self, listeners: List[DispatcherListener]):
+        """Send a message to all workers/listeners, that we just started"""
         notification = Notification(type=NotificationType.JUST_STARTED, topic="", payload=None)
 
         for listener in list(listeners):

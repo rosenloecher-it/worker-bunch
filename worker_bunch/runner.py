@@ -86,7 +86,7 @@ class Runner:
         for worker in self._workers:
             worker.start()
 
-        self._dispatcher.trigger_just_started()
+        self._dispatcher.trigger_just_started(self._workers)
 
         while True:
             self._mqtt_proxy.publish()
@@ -111,7 +111,7 @@ class Runner:
 
         messages = self._mqtt_proxy.get_messages()
         self._dispatcher.push_mqtt_messages(messages)
-        self._dispatcher.trigger_just_started()
+        self._dispatcher.trigger_just_started(self._workers)
 
         await asyncio.sleep(0.2)  # wait for debounce pipelines to finish
 
