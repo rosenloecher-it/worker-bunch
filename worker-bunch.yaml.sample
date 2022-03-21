@@ -6,6 +6,10 @@ logging:
     module_levels:
         "schedule":             "info"
 
+service:
+    # locale:                   "de_DE.UTF8"
+    data_directory:             "./__data__"
+
 mqtt_broker:
     host:                       "<host>"
     port:                       1883

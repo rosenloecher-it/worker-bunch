@@ -1,32 +1,86 @@
 import copy
+import locale
+import logging
 import os
+import pathlib
+import uuid
 from typing import Dict, Optional
-
 
 import yaml
 from jsonschema import validate
 
-from worker_bunch.service_config import MainConfKey, CONFIG_JSONSCHEMA
+from worker_bunch.service_config import MainConfKey, CONFIG_JSONSCHEMA, ServiceConfKey, ConfigException
 from worker_bunch.worker.worker_config import WorkerSettingsDeclaration
+
+_logger = logging.getLogger(__name__)
 
 
 class ServiceConfigurator:
 
     def __init__(self):
         self._config_data = {}
+        self._config_file: Optional[str] = None
 
     def read_config_file(self, config_file, skip_file_access_check=False):
+        self._config_file = os.path.abspath(config_file)
 
         if not skip_file_access_check:
-            self.check_config_file_access(config_file)
+            self.check_config_file_access(self._config_file)
 
-        with open(config_file, 'r') as stream:
+        with open(self._config_file, 'r') as stream:
             file_data = yaml.unsafe_load(stream)
 
         # first validation without worker config
         validate(file_data, CONFIG_JSONSCHEMA)
 
         self._config_data = file_data
+
+        # ensure service section, which will be made available to workers
+        service_settings = self._config_data.get(MainConfKey.SERVICE)
+        if service_settings is None:
+            service_settings = {}
+            self._config_data[MainConfKey.SERVICE] = service_settings
+
+    def init_locale(self):
+        locale_name = self.get_service_config().get(ServiceConfKey.LOCALE)
+
+        try:
+            if locale_name:
+                locale_was_set = locale.setlocale(locale.LC_ALL, locale_name.strip())
+                _logger.debug("set locale: '%s'", locale_was_set)
+        except locale.Error as ex:
+            raise ConfigException(f"set locale failed (use e.g. 'de_DE.UTF8', not '{locale_name}'): {ex}")
+
+    def init_data_dir(self):
+        service_settings = self.get_service_config()
+        data_dir = service_settings.get(ServiceConfKey.DATA_DIR)
+
+        if not data_dir:
+            _logger.info("no data dir configured. workers may not be able to write to disc.")
+            return
+
+        if not os.path.isabs(data_dir):
+            dirname = os.path.dirname(self._config_file)
+            data_dir = os.path.realpath(os.path.join(dirname, data_dir))
+            service_settings[ServiceConfKey.DATA_DIR] = data_dir
+
+        if not os.path.isdir(data_dir):
+            try:
+                os.makedirs(data_dir, exist_ok=True)
+            except PermissionError as ex:
+                raise ConfigException(f"Provide a proper, writable data directory! '{data_dir}': {ex}")
+
+        # check write permission
+        for i in range(1, 3):
+            touch_file = os.path.join(data_dir, f"touch-test.{str(uuid.uuid4())}")
+            if not os.path.exists(touch_file):
+                try:
+                    pathlib.Path(touch_file).touch()
+                    os.remove(touch_file)
+                    break
+                except Exception as ex:
+                    raise ConfigException(f"Data dir write check failed! {ex}")
+        # ... _logger.info("could not check data dir write permission...?!")
 
     @classmethod
     def create_extended_json_schema(cls, declarations: Dict[str, WorkerSettingsDeclaration]) -> Dict[str, any]:
@@ -70,6 +124,13 @@ class ServiceConfigurator:
 
     def get_database_config(self):
         return self._config_data.get(MainConfKey.DATABASE_CONNECTIONS, {})
+
+    def get_service_config(self):
+        return self._config_data[MainConfKey.SERVICE]
+
+    def get_data_dir(self) -> str:
+        service_settings = self.get_service_config()
+        return service_settings.get(ServiceConfKey.DATA_DIR)
 
     @classmethod
     def check_config_file_access(cls, config_file):

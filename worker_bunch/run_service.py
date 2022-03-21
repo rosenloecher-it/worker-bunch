@@ -125,6 +125,9 @@ def run_service(config_file, log_file, log_level, print_log_console, skip_log_ti
         )
         _logger.debug("start")
 
+        service_config.init_locale()
+        service_config.init_data_dir()
+
         worker_instances_config = service_config.get_worker_instances_config()
         worker_dict = WorkerFactory.create_workers(worker_instances_config)
         workers_settings_declarations = WorkerFactory.extract_workers_settings_declarations(worker_dict)
@@ -150,8 +153,10 @@ def run_service(config_file, log_file, log_level, print_log_console, skip_log_ti
 
         workers_settings = service_config.get_worker_settings()
 
+        data_dir = service_config.get_data_dir()
         for worker in workers:
             # before set_mqtt_proxy ("last will" depends on config)!
+            worker.set_base_data_dir(data_dir)
             worker.set_extra_settings(workers_settings.get(worker.name))
 
             worker.set_database_manager(database_manager)

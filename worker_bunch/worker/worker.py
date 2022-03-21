@@ -1,6 +1,7 @@
 import abc
 import copy
 import logging
+import os
 import threading
 from logging import Logger
 from typing import Dict, List, Optional, Set
@@ -8,6 +9,7 @@ from typing import Dict, List, Optional, Set
 from worker_bunch.database.database_manager import DatabaseManager
 from worker_bunch.dispatcher import Dispatcher, DispatcherListener
 from worker_bunch.mqtt.mqtt_proxy import MqttProxy
+from worker_bunch.service_config import ConfigException
 from worker_bunch.service_logging import ServiceLogging
 from worker_bunch.notification import Notification
 from worker_bunch.time_utils import TimeUtils
@@ -24,6 +26,7 @@ class Worker(threading.Thread, DispatcherListener):
 
         self._lock = threading.Lock()
         self._closing = False  # shutdown in process
+        self._base_data_dir: Optional[str] = None
 
         self.__logger: Optional[Logger] = None
 
@@ -42,6 +45,18 @@ class Worker(threading.Thread, DispatcherListener):
     def set_extra_settings(self, extra_settings: Optional[Dict[str, any]]):
         with self._lock:
             self._extra_settings = copy.deepcopy(extra_settings) if extra_settings else {}
+
+    def set_base_data_dir(self, base_data_dir: str):
+        self._base_data_dir = base_data_dir
+
+    def ensure_data_path(self, file_name: Optional[str] = None) -> str:
+        if not self._base_data_dir:
+            raise ConfigException("No data dir configured!")
+        data_path = os.path.join(self._base_data_dir, self.name)  # base dir + worker name
+        os.makedirs(data_path, exist_ok=True)
+        if file_name:
+            data_path = os.path.join(data_path, file_name)
+        return data_path
 
     def set_database_manager(self, database_manager: DatabaseManager):
         with self._lock:

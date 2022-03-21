@@ -9,11 +9,37 @@ class ConfigException(Exception):
     pass
 
 
+class ServiceConfKey:
+    LOCALE = "locale"
+    DATA_DIR = "data_directory"
+
+
+SERVICE_JSONSCHEMA = {
+    "type": "object",
+    "properties": {
+        ServiceConfKey.LOCALE: {
+            "type": "string",
+            "minLength": 1,
+            "description": "",
+        },
+        ServiceConfKey.DATA_DIR: {
+            "type": "string",
+            "minLength": 1,
+            "description": "Promoted to workers, so they store their data there. Make sure it's writable. "
+                           "Relative paths refer to config file.",
+        },
+    },
+    "additionalProperties": False,
+    "required": [],
+}
+
+
 class MainConfKey:
     ASTRAL_TIMES = "astral_times"
     DATABASE_CONNECTIONS = "database_connections"
     LOGGING = "logging"
     MQTT_BROKER = "mqtt_broker"
+    SERVICE = "service"
     WORKER_INSTANCES = "worker_instances"
     WORKER_SETTINGS = "worker_settings"
     YAML_TEMPLATES = "yaml_templates"
@@ -26,6 +52,7 @@ CONFIG_JSONSCHEMA = {
         MainConfKey.DATABASE_CONNECTIONS: DATABASE_CONNECTIONS_JSONSCHEMA,
         MainConfKey.LOGGING: LOGGING_JSONSCHEMA,
         MainConfKey.MQTT_BROKER: MQTT_JSONSCHEMA,
+        MainConfKey.SERVICE: SERVICE_JSONSCHEMA,
         MainConfKey.WORKER_INSTANCES: WORKER_INSTANCES_JSONSCHEMA,
         MainConfKey.WORKER_SETTINGS: {
             "type": "object",
