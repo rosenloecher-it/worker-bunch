@@ -7,6 +7,7 @@ from typing import List, Optional
 
 from worker_bunch.dispatcher import Dispatcher
 from worker_bunch.mqtt.mqtt_proxy import MqttProxy
+from worker_bunch.notification import NotificationType
 from worker_bunch.time_utils import TimeUtils
 from worker_bunch.worker.worker import Worker
 
@@ -86,7 +87,7 @@ class Runner:
         for worker in self._workers:
             worker.start()
 
-        self._dispatcher.trigger_just_started(self._workers)
+        self._dispatcher.trigger_start_notification(self._workers)
 
         while True:
             self._mqtt_proxy.publish()
@@ -111,7 +112,7 @@ class Runner:
 
         messages = self._mqtt_proxy.get_messages()
         self._dispatcher.push_mqtt_messages(messages)
-        self._dispatcher.trigger_just_started(self._workers)
+        self._dispatcher.trigger_start_notification(self._workers, NotificationType.SINGLE_STARTED)
 
         await asyncio.sleep(0.2)  # wait for debounce pipelines to finish
 

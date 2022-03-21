@@ -12,6 +12,7 @@ class NotificationType(Enum):
     CRON = "CRON"
     JUST_STARTED = "JUST_STARTED"
     MQTT_MESSAGE = "MQTT_MESSAGE"
+    SINGLE_STARTED = "SINGLE_STARTED"  # used to signal "DEBUG" to worker
     TIMER = "TIMER"
 
 

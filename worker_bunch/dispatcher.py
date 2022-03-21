@@ -221,9 +221,11 @@ class Dispatcher:
             for listener in send_to:
                 self._send_notifications(listener)
 
-    def trigger_just_started(self, listeners: List[DispatcherListener]):
+    def trigger_start_notification(self, listeners: List[DispatcherListener], notification_type: NotificationType = None):
         """Send a message to all workers/listeners, that we just started"""
-        notification = Notification(type=NotificationType.JUST_STARTED, topic="", payload=None)
+        if not notification_type:
+            notification_type = NotificationType.JUST_STARTED
+        notification = Notification(type=notification_type, topic="", payload=None)
 
         for listener in list(listeners):
             self._store_notification(listener, notification)
