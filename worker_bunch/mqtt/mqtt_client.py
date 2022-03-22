@@ -1,8 +1,7 @@
-import json
 import logging
 import random
 import threading
-from typing import Dict, List, Optional, Union
+from typing import List, Optional
 
 import paho.mqtt.client as mqtt
 
@@ -99,15 +98,12 @@ class MqttClient:
             self._client = None
             _logger.debug("%s was closed.", self.__class__.__name__)
 
-    def set_last_will(self, topic: str, last_will: Union[str, Dict], retain: Optional[bool] = None, qos: Optional[int] = None):
+    def set_last_will(self, topic: str, last_will: str, retain: Optional[bool] = None, qos: Optional[int] = None):
         if self.is_connected():
             raise MqttException("will must be set before connecting!")
 
         retain = self._default_retain if retain is None else retain
         qos = self._default_qos if qos is None else qos
-
-        if isinstance(last_will, dict):
-            last_will = json.dumps(last_will, sort_keys=True)
 
         self._client.will_set(
             topic=topic,
@@ -122,7 +118,7 @@ class MqttClient:
             self._messages = []
             return messages
 
-    def publish(self, topic: str, payload: Union[str, Dict], retain: Optional[bool] = None, qos: Optional[int] = None):
+    def publish(self, topic: str, payload: str, retain: Optional[bool] = None, qos: Optional[int] = None):
         if self._shutdown:
             return
 
@@ -131,9 +127,6 @@ class MqttClient:
 
         retain = self._default_retain if retain is None else retain
         qos = self._default_qos if qos is None else qos
-
-        if isinstance(payload, dict):
-            payload = json.dumps(payload, sort_keys=True)
 
         result = self._client.publish(
             topic=topic,

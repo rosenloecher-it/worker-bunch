@@ -1,5 +1,3 @@
-import datetime
-import json
 import threading
 from collections import namedtuple
 from typing import Dict, List, Optional, Union
@@ -8,6 +6,7 @@ from paho.mqtt.client import MQTTMessage
 
 from worker_bunch.mqtt.mqtt_client import MqttClient
 from worker_bunch.service_config import ConfigException
+from worker_bunch.utils.json_utils import JsonUtils
 
 ProxyMessage = namedtuple("ProxyMessage", ["topic", "payload", "retain"])
 
@@ -41,6 +40,9 @@ class MqttProxy:
         if not self._mqtt_client:
             raise ConfigException("no mqtt client configured!")
 
+        if isinstance(last_will, dict):
+            last_will = JsonUtils.dumps(last_will)
+
         with self._lock:
             if self._mqtt_client and topic and last_will:
                 self._mqtt_client.set_last_will(topic=topic, last_will=last_will, retain=retain)
@@ -60,20 +62,12 @@ class MqttProxy:
             else:
                 return []
 
-    @classmethod
-    def default_json_serial(cls, obj):
-        """JSON serializer for objects not serializable by default json code"""
-        if isinstance(obj, (datetime.datetime, datetime.date)):
-            return obj.isoformat()
-
-        raise TypeError(f"Type '{type(obj)}' is not JSON serializable!")
-
     def queue(self, topic: str, payload: Union[str, Dict], retain: Optional[bool] = None):
         if not self._mqtt_client:
             raise ConfigException("no mqtt client configured!")
 
         if isinstance(payload, dict):
-            payload = json.dumps(payload, sort_keys=True, default=self.default_json_serial)
+            payload = JsonUtils.dumps(payload)
 
         with self._lock:
             self._messages.append(ProxyMessage(topic=topic, payload=payload, retain=retain))
