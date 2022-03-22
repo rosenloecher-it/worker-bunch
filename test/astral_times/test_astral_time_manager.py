@@ -88,6 +88,19 @@ class TestAstralTimeManager(unittest.TestCase):
             AstralParsed(predefined=AstralTime.SUNRISE)
         )
 
+    def test_get_astral_time(self):
+        m = AstralTimesManager(self.DUMMY_CONFIG)
+        now = datetime(2022, 3, 19, 7, 55, 15, tzinfo=timezone(timedelta(seconds=3600)))
+
+        sunset = m.get_astral_time("sunset", now)
+        self.assertEqual(sunset, datetime(2022, 3, 19, 18, 18, tzinfo=timezone(timedelta(seconds=3600))))
+
+        astral_times = m.get_astral_times(now)
+        self.assertEqual(sunset, astral_times["sunset"])
+
+        with self.assertRaises(ValueError):
+            m.get_astral_time("does not exists", now)
+
     def test_get_astral_times(self):
         m = AstralTimesManager(self.DUMMY_CONFIG)
         now = datetime(2022, 3, 19, 9, 55, 15, tzinfo=timezone(timedelta(seconds=3600)))

@@ -85,6 +85,14 @@ class AstralTimesManager:
         astral_time = self._get_or_calc_astral_time(astral_key, pivot_time)
         return astral_time == pivot_time
 
+    def get_astral_time(self, astral_key: str, pivot_time: Optional[datetime.datetime] = None) -> datetime.datetime:
+        if pivot_time is None:
+            pivot_time = TimeUtils.now()
+        pivot_time = self.round_time_to_minute(pivot_time)
+
+        astral_time = self._get_or_calc_astral_time(astral_key, pivot_time)
+        return astral_time
+
     def get_astral_times(self, time: Optional[datetime.datetime] = None) -> Dict[str, any]:
         if time is None:
             time = TimeUtils.now()
