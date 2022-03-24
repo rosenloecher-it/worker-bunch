@@ -17,6 +17,21 @@ class AstralTime(Enum):
 
     MIDNIGHT = "midnight"
 
+    @classmethod
+    def values(cls):
+        return [astral_time.value for astral_time in AstralTime]
+
+    @classmethod
+    def extended_values(cls):
+        values = [astral_time.value for astral_time in AstralTime]
+
+        for i in range(2, 19):
+            values.append(f"dawn_{i}")
+        for i in range(2, 19):
+            values.append(f"dusk_{i}")
+
+        return values
+
 
 class AstralTimesConfKey:
 
