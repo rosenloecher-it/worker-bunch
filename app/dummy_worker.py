@@ -45,10 +45,10 @@ class DummyWorker(Worker):
     def setup(self, **kwargs):
         super().setup(**kwargs)
 
-        self._mqtt_last_will = self._extra_settings.get(DummyWorkerConfKey.MQTT_LAST_WILL)
-        self._mqtt_retain = self._extra_settings.get(DummyWorkerConfKey.MQTT_RETAIN, False)
-        self._mqtt_topic_out = self._extra_settings.get(DummyWorkerConfKey.MQTT_TOPIC_OUT)
-        self._mqtt_topics_in = self._extra_settings.get(DummyWorkerConfKey.MQTT_TOPICS_IN, [])
+        self._mqtt_last_will = self._worker_settings.get(DummyWorkerConfKey.MQTT_LAST_WILL)
+        self._mqtt_retain = self._worker_settings.get(DummyWorkerConfKey.MQTT_RETAIN, False)
+        self._mqtt_topic_out = self._worker_settings.get(DummyWorkerConfKey.MQTT_TOPIC_OUT)
+        self._mqtt_topics_in = self._worker_settings.get(DummyWorkerConfKey.MQTT_TOPICS_IN, [])
 
     def get_partial_settings_schema(self) -> Optional[Dict[str, any]]:
         """returns a partial JSON schema for extra setting if needed. overwrite..."""

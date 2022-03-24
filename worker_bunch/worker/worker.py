@@ -31,7 +31,7 @@ class Worker(threading.Thread, DispatcherListener):
 
         self._notifications: Set[Notification] = set()
 
-        self._extra_settings: Dict[str, any] = {}
+        self._worker_settings: Dict[str, any] = {}
         self._mqtt_proxy: Optional[MqttProxy] = None
 
     def __str__(self):
@@ -45,7 +45,7 @@ class Worker(threading.Thread, DispatcherListener):
         with self._lock:
             self._base_data_dir = kwargs.get("base_data_dir")
             worker_settings = kwargs.get("worker_settings")
-            self._extra_settings = copy.deepcopy(worker_settings) if worker_settings else {}
+            self._worker_settings = copy.deepcopy(worker_settings) if worker_settings else {}
             self._mqtt_proxy = kwargs.get("mqtt_proxy")
 
     def ensure_data_path(self, file_name: Optional[str] = None) -> str:

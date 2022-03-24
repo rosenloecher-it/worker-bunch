@@ -103,7 +103,7 @@ class ServiceConfigurator:
         schema["properties"][MainConfKey.WORKER_SETTINGS] = worker_settings_schema
         return schema
 
-    def revalidate_worker_extra_settings(self, declarations: Dict[str, WorkerSettingsDeclaration]):
+    def revalidate_worker_settings(self, declarations: Dict[str, WorkerSettingsDeclaration]):
         extended_schema = self.create_extended_json_schema(declarations)
         validate(self._config_data, extended_schema)
 

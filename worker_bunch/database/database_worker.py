@@ -49,12 +49,12 @@ class DatabaseWorker(Worker):
 
         self._database_manager = kwargs["database_manager"]
 
-        self._connection_key = self._extra_settings[DatabaseConfKey.CONNECTION_KEY]
-        self._cron = self._extra_settings[DatabaseConfKey.CRON]
-        self._replacements = self._extra_settings.get(DatabaseConfKey.REPLACEMENTS, {})
+        self._connection_key = self._worker_settings[DatabaseConfKey.CONNECTION_KEY]
+        self._cron = self._worker_settings[DatabaseConfKey.CRON]
+        self._replacements = self._worker_settings.get(DatabaseConfKey.REPLACEMENTS, {})
 
         self._steps = []
-        config_steps = self._extra_settings[DatabaseConfKey.STEPS]
+        config_steps = self._worker_settings[DatabaseConfKey.STEPS]
 
         found_config_error = False
 

@@ -132,7 +132,7 @@ def run_service(config_file, log_file, log_level, print_log_console, skip_log_ti
         worker_dict = WorkerFactory.create_workers(worker_instances_config)
         workers_settings_declarations = WorkerFactory.extract_workers_settings_declarations(worker_dict)
 
-        service_config.revalidate_worker_extra_settings(workers_settings_declarations)
+        service_config.revalidate_worker_settings(workers_settings_declarations)
 
         if test_single:
             single_worker = worker_dict.get(test_single)

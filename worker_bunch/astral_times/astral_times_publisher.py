@@ -41,9 +41,9 @@ class AstralTimesPublisher(Worker):
 
         self._astral_time_manager = kwargs["astral_time_manager"]
 
-        self._mqtt_last_will = self._extra_settings.get(AstralTimesPublisherConfKey.MQTT_LAST_WILL)
-        self._mqtt_retain = self._extra_settings.get(AstralTimesPublisherConfKey.MQTT_RETAIN, False)
-        self._mqtt_topic_out = self._extra_settings[AstralTimesPublisherConfKey.MQTT_TOPIC_OUT]
+        self._mqtt_last_will = self._worker_settings.get(AstralTimesPublisherConfKey.MQTT_LAST_WILL)
+        self._mqtt_retain = self._worker_settings.get(AstralTimesPublisherConfKey.MQTT_RETAIN, False)
+        self._mqtt_topic_out = self._worker_settings[AstralTimesPublisherConfKey.MQTT_TOPIC_OUT]
 
     def get_partial_settings_schema(self) -> Dict[str, any]:
         return ASTRAL_TIMES_PUBLISHER_JSONSCHEMA
