@@ -1,5 +1,6 @@
-import schedule
 from typing import Dict, List, Optional
+
+import schedule
 
 from worker_bunch.dispatcher import Dispatcher
 from worker_bunch.notification import Notification
@@ -41,8 +42,8 @@ class DummyWorker(Worker):
         self._mqtt_topic_out = []
         self._mqtt_topics_in = ""
 
-    def set_extra_settings(self, extra_settings: Optional[Dict[str, any]]):
-        super().set_extra_settings(extra_settings)
+    def setup(self, **kwargs):
+        super().setup(**kwargs)
 
         self._mqtt_last_will = self._extra_settings.get(DummyWorkerConfKey.MQTT_LAST_WILL)
         self._mqtt_retain = self._extra_settings.get(DummyWorkerConfKey.MQTT_RETAIN, False)

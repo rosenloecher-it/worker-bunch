@@ -36,8 +36,10 @@ class AstralTimesPublisher(Worker):
 
         self._astral_time_manager: Optional[AstralTimesManager] = None
 
-    def set_extra_settings(self, extra_settings: Optional[Dict[str, any]]):
-        super().set_extra_settings(extra_settings)
+    def setup(self, **kwargs):
+        super().setup(**kwargs)
+
+        self._astral_time_manager = kwargs["astral_time_manager"]
 
         self._mqtt_last_will = self._extra_settings.get(AstralTimesPublisherConfKey.MQTT_LAST_WILL)
         self._mqtt_retain = self._extra_settings.get(AstralTimesPublisherConfKey.MQTT_RETAIN, False)
@@ -55,9 +57,6 @@ class AstralTimesPublisher(Worker):
             self._mqtt_proxy.set_last_will(self._mqtt_topic_out, self._mqtt_last_will)
 
     def subscribe_notifications(self, dispatcher: Dispatcher):
-
-        self._astral_time_manager = dispatcher.get_astral_time_manager()
-
         dispatcher.subscribe_cron(self, "* 0 * * *", "cron-every-hour")
 
     def _work(self, notifications: List[Notification]):

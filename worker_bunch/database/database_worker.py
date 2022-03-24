@@ -8,6 +8,7 @@ from psycopg.rows import dict_row
 
 from worker_bunch.database.database_config import DatabaseConfKey, MqttOutputType, DATABASE_WORKER_JSONSCHEMA
 from worker_bunch.database.database_connector import DatabaseConnector
+from worker_bunch.database.database_manager import DatabaseManager
 from worker_bunch.database.database_utils import DatabaseUtils
 from worker_bunch.dispatcher import Dispatcher
 from worker_bunch.notification import Notification, NT
@@ -37,13 +38,16 @@ class DatabaseWorker(Worker):
     def __init__(self, name: str):
         super().__init__(name)
 
+        self._database_manager: Optional[DatabaseManager] = None
         self._connection_key: Optional[str] = None
         self._cron: Optional[str] = None
         self._steps: List[Step] = []
         self._replacements: Dict[str, str] = {}
 
-    def set_extra_settings(self, extra_settings: Optional[Dict[str, any]]):
-        super().set_extra_settings(extra_settings)
+    def setup(self, **kwargs):
+        super().setup(**kwargs)
+
+        self._database_manager = kwargs["database_manager"]
 
         self._connection_key = self._extra_settings[DatabaseConfKey.CONNECTION_KEY]
         self._cron = self._extra_settings[DatabaseConfKey.CRON]

@@ -29,14 +29,16 @@ class TestAstralTimesPublisher(unittest.TestCase):
         self.dispatcher = Dispatcher(self.manager)
         self.mqtt_proxy = None  # MagicMock[MqttProxy]
 
+        self.mqtt_proxy = mock.MagicMock(MqttProxy, autospec=True)
+
         self.worker = AstralTimesPublisher("test")
-        self.worker.set_extra_settings(self.SETTINGS)
+        self.worker.setup(astral_time_manager=self.manager, mqtt_proxy=self.mqtt_proxy, worker_settings=self.SETTINGS)
 
         self.reset_mqtt_proxy()
 
     def reset_mqtt_proxy(self):
         self.mqtt_proxy = mock.MagicMock(MqttProxy, autospec=True)
-        self.worker.set_mqtt_proxy(self.mqtt_proxy)
+        self.worker._mqtt_proxy = self.mqtt_proxy
 
     @mock.patch("worker_bunch.time_utils.TimeUtils.now")
     def test_round_trip(self, mocked_now):

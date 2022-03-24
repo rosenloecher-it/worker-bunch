@@ -6,12 +6,11 @@ import threading
 from logging import Logger
 from typing import Dict, List, Optional, Set
 
-from worker_bunch.database.database_manager import DatabaseManager
 from worker_bunch.dispatcher import Dispatcher, DispatcherListener
 from worker_bunch.mqtt.mqtt_proxy import MqttProxy
+from worker_bunch.notification import Notification
 from worker_bunch.service_config import ConfigException
 from worker_bunch.service_logging import ServiceLogging
-from worker_bunch.notification import Notification
 from worker_bunch.time_utils import TimeUtils
 
 
@@ -32,7 +31,6 @@ class Worker(threading.Thread, DispatcherListener):
 
         self._notifications: Set[Notification] = set()
 
-        self._database_manager: Optional[DatabaseManager] = None
         self._extra_settings: Dict[str, any] = {}
         self._mqtt_proxy: Optional[MqttProxy] = None
 
@@ -42,12 +40,13 @@ class Worker(threading.Thread, DispatcherListener):
     def __repr__(self) -> str:
         return '{}({})'.format(self.__class__.__name__, self.name)
 
-    def set_extra_settings(self, extra_settings: Optional[Dict[str, any]]):
+    def setup(self, **kwargs):
+        """bb"""
         with self._lock:
-            self._extra_settings = copy.deepcopy(extra_settings) if extra_settings else {}
-
-    def set_base_data_dir(self, base_data_dir: str):
-        self._base_data_dir = base_data_dir
+            self._base_data_dir = kwargs.get("base_data_dir")
+            worker_settings = kwargs.get("worker_settings")
+            self._extra_settings = copy.deepcopy(worker_settings) if worker_settings else {}
+            self._mqtt_proxy = kwargs.get("mqtt_proxy")
 
     def ensure_data_path(self, file_name: Optional[str] = None) -> str:
         if not self._base_data_dir:
@@ -57,14 +56,6 @@ class Worker(threading.Thread, DispatcherListener):
         if file_name:
             data_path = os.path.join(data_path, file_name)
         return data_path
-
-    def set_database_manager(self, database_manager: DatabaseManager):
-        with self._lock:
-            self._database_manager = database_manager
-
-    def set_mqtt_proxy(self, mqtt_proxy: MqttProxy):
-        with self._lock:
-            self._mqtt_proxy = mqtt_proxy
 
     def get_partial_settings_schema(self) -> Optional[Dict[str, any]]:
         """returns a partial JSON schema for extra setting if needed. overwrite..."""

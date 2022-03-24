@@ -85,9 +85,6 @@ class Dispatcher:
             disposable.dispose()
         self._disposables = []
 
-    def get_astral_time_manager(self) -> AstralTimesManager:
-        return self._astral_time_manager
-
     def get_mqtt_topics(self) -> List[str]:
         topics = [m.topic for m in self._wildcard_topic_matches]
         topics.extend([m.topic for m in self._exact_topic_matches.values()])

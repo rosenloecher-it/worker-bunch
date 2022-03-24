@@ -155,13 +155,15 @@ def run_service(config_file, log_file, log_level, print_log_console, skip_log_ti
 
         data_dir = service_config.get_data_dir()
         for worker in workers:
-            # before set_mqtt_proxy ("last will" depends on config)!
-            worker.set_base_data_dir(data_dir)
-            worker.set_extra_settings(workers_settings.get(worker.name))
+            worker.setup(
+                astral_time_manager=astral_time_manager,
+                base_data_dir=data_dir,
+                database_manager=database_manager,
+                mqtt_proxy=mqtt_proxy,
+                worker_settings=workers_settings.get(worker.name),
+            )
 
-            worker.set_database_manager(database_manager)
-            worker.set_mqtt_proxy(mqtt_proxy)
-            worker.set_last_will()
+            worker.set_last_will()  # before set_mqtt_proxy ("last will" depends on config)!
 
         # start
         runner = Runner(dispatcher, mqtt_proxy, workers)
