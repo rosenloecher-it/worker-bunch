@@ -14,3 +14,7 @@ class TestAstralTime(unittest.TestCase):
         self.assertTrue(values)
         self.assertIn("sunset", values)
         self.assertTrue(len(values) < len(extended_values))
+
+    def test_astral_values_exist(self):
+        self.assertTrue(AstralTime.extended_value_exists("sunrise"))
+        self.assertFalse(AstralTime.extended_value_exists("unknown..."))

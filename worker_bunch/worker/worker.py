@@ -41,7 +41,6 @@ class Worker(threading.Thread, DispatcherListener):
         return '{}({})'.format(self.__class__.__name__, self.name)
 
     def setup(self, **kwargs):
-        """bb"""
         with self._lock:
             self._base_data_dir = kwargs.get("base_data_dir")
             worker_settings = kwargs.get("worker_settings")

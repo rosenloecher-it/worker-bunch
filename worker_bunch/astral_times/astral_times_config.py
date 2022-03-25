@@ -1,4 +1,10 @@
+import threading
 from enum import Enum
+from typing import List, Optional, Set
+
+
+_astral_times_lock = threading.Lock()
+_astral_extended_values: Optional[Set[str]] = None
 
 
 class AstralTime(Enum):
@@ -22,15 +28,31 @@ class AstralTime(Enum):
         return [astral_time.value for astral_time in AstralTime]
 
     @classmethod
-    def extended_values(cls):
-        values = [astral_time.value for astral_time in AstralTime]
+    def extended_values(cls) -> List[str]:
+        with _astral_times_lock:
+            if not _astral_extended_values:
+                cls._init_extended_values()
+            return list(_astral_extended_values)
 
-        for i in range(2, 19):
-            values.append(f"dawn_{i}")
-        for i in range(2, 19):
-            values.append(f"dusk_{i}")
+    @classmethod
+    def extended_value_exists(cls, value: str) -> bool:
+        if not value:
+            return False
+        with _astral_times_lock:
+            global _astral_extended_values
+            if not _astral_extended_values:
+                cls._init_extended_values()
+            return value in _astral_extended_values
 
-        return values
+    @classmethod
+    def _init_extended_values(cls):
+        global _astral_extended_values
+        _astral_extended_values = set()
+        for astral_time in AstralTime:
+            _astral_extended_values.add(astral_time.value)
+        for i in range(2, 19):
+            _astral_extended_values.add(f"dawn_{i}")
+            _astral_extended_values.add(f"dusk_{i}")
 
 
 class AstralTimesConfKey:
