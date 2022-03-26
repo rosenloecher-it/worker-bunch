@@ -17,7 +17,7 @@ from worker_bunch.mqtt.mqtt_client import MqttClient, MqttClientFactory
 from worker_bunch.mqtt.mqtt_proxy import MqttProxy
 from worker_bunch.runner import Runner
 from worker_bunch.time_utils import TimeUtils
-from worker_bunch.worker.worker import Worker
+from worker_bunch.worker.worker import Worker, WorkerSetup
 from worker_bunch.worker.worker_factory import WorkerFactory
 
 _logger = logging.getLogger(__name__)
@@ -155,14 +155,13 @@ def run_service(config_file, log_file, log_level, print_log_console, skip_log_ti
 
         data_dir = service_config.get_data_dir()
         for worker in workers:
-            worker.setup(
-                astral_time_manager=astral_time_manager,
-                base_data_dir=data_dir,
-                database_manager=database_manager,
-                mqtt_proxy=mqtt_proxy,
-                worker_settings=workers_settings.get(worker.name),
-            )
-
+            worker.setup({
+                WorkerSetup.ASTRAL_TIME_MANAGER: astral_time_manager,
+                WorkerSetup.BASE_DATA_DIR: data_dir,
+                WorkerSetup.DATABASE_MANAGER: database_manager,
+                WorkerSetup.MQTT_PROXY: mqtt_proxy,
+                WorkerSetup.WORKER_SETTINGS: workers_settings.get(worker.name),
+            })
             worker.set_last_will()  # before set_mqtt_proxy ("last will" depends on config)!
 
         # start

@@ -14,7 +14,7 @@ from worker_bunch.dispatcher import Dispatcher
 from worker_bunch.notification import Notification, NT
 from worker_bunch.service_config import ConfigException
 from worker_bunch.time_utils import TimeUtils
-from worker_bunch.worker.worker import Worker
+from worker_bunch.worker.worker import Worker, WorkerSetup
 
 
 @attr.define
@@ -44,10 +44,10 @@ class DatabaseWorker(Worker):
         self._steps: List[Step] = []
         self._replacements: Dict[str, str] = {}
 
-    def setup(self, **kwargs):
-        super().setup(**kwargs)
+    def setup(self, props):
+        super().setup(props)
 
-        self._database_manager = kwargs["database_manager"]
+        self._database_manager = props[WorkerSetup.DATABASE_MANAGER]
 
         self._connection_key = self._worker_settings[DatabaseConfKey.CONNECTION_KEY]
         self._cron = self._worker_settings[DatabaseConfKey.CRON]

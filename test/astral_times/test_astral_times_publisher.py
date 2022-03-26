@@ -8,6 +8,7 @@ from worker_bunch.astral_times.astral_times_publisher import AstralTimesPublishe
 from worker_bunch.dispatcher import Dispatcher
 from worker_bunch.mqtt.mqtt_proxy import MqttProxy
 from worker_bunch.notification import Notification
+from worker_bunch.worker.worker import WorkerSetup
 
 
 class TestAstralTimesPublisher(unittest.TestCase):
@@ -32,7 +33,11 @@ class TestAstralTimesPublisher(unittest.TestCase):
         self.mqtt_proxy = mock.MagicMock(MqttProxy, autospec=True)
 
         self.worker = AstralTimesPublisher("test")
-        self.worker.setup(astral_time_manager=self.manager, mqtt_proxy=self.mqtt_proxy, worker_settings=self.SETTINGS)
+        self.worker.setup({
+            WorkerSetup.ASTRAL_TIME_MANAGER: self.manager,
+            WorkerSetup.MQTT_PROXY: self.mqtt_proxy,
+            WorkerSetup.WORKER_SETTINGS: self.SETTINGS,
+        })
 
         self.reset_mqtt_proxy()
 

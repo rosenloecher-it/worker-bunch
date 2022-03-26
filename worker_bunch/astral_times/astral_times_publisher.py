@@ -3,7 +3,7 @@ from typing import Dict, Optional, List
 from worker_bunch.astral_times.astral_times_manager import AstralTimesManager
 from worker_bunch.dispatcher import Dispatcher
 from worker_bunch.notification import Notification, NotificationType
-from worker_bunch.worker.worker import Worker
+from worker_bunch.worker.worker import Worker, WorkerSetup
 
 
 class AstralTimesPublisherConfKey:
@@ -36,10 +36,10 @@ class AstralTimesPublisher(Worker):
 
         self._astral_time_manager: Optional[AstralTimesManager] = None
 
-    def setup(self, **kwargs):
-        super().setup(**kwargs)
+    def setup(self, props):
+        super().setup(props)
 
-        self._astral_time_manager = kwargs["astral_time_manager"]
+        self._astral_time_manager = props[WorkerSetup.ASTRAL_TIME_MANAGER]
 
         self._mqtt_last_will = self._worker_settings.get(AstralTimesPublisherConfKey.MQTT_LAST_WILL)
         self._mqtt_retain = self._worker_settings.get(AstralTimesPublisherConfKey.MQTT_RETAIN, False)

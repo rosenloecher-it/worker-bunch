@@ -3,6 +3,7 @@ import copy
 import logging
 import os
 import threading
+from enum import Enum
 from logging import Logger
 from typing import Dict, List, Optional, Set
 
@@ -16,6 +17,15 @@ from worker_bunch.time_utils import TimeUtils
 
 class ShutdownException(Exception):
     pass
+
+
+class WorkerSetup(Enum):
+    """keys used in Worker.setup kwargs"""
+    ASTRAL_TIME_MANAGER = "astral_time_manager"
+    BASE_DATA_DIR = "base_data_dir"
+    DATABASE_MANAGER = "database_manager"
+    MQTT_PROXY = "mqtt_proxy"
+    WORKER_SETTINGS = "worker_settings"
 
 
 class Worker(threading.Thread, DispatcherListener):
@@ -40,12 +50,12 @@ class Worker(threading.Thread, DispatcherListener):
     def __repr__(self) -> str:
         return '{}({})'.format(self.__class__.__name__, self.name)
 
-    def setup(self, **kwargs):
+    def setup(self, props: Dict[WorkerSetup, any]):
         with self._lock:
-            self._base_data_dir = kwargs.get("base_data_dir")
-            worker_settings = kwargs.get("worker_settings")
+            self._base_data_dir = props.get(WorkerSetup.BASE_DATA_DIR)
+            worker_settings = props.get(WorkerSetup.WORKER_SETTINGS)
             self._worker_settings = copy.deepcopy(worker_settings) if worker_settings else {}
-            self._mqtt_proxy = kwargs.get("mqtt_proxy")
+            self._mqtt_proxy = props.get(WorkerSetup.MQTT_PROXY)
 
     def ensure_data_path(self, file_name: Optional[str] = None) -> str:
         if not self._base_data_dir:
