@@ -138,13 +138,13 @@ class Dispatcher:
 
     def subscribe_astral_or_cron(self, listener: DispatcherListener, astral_or_cron: str, topic: str):
         if self._astral_time_manager.is_valid_astral_time_key(astral_or_cron):
-            self.subscribe_astral_times(listener, astral_or_cron, topic)
+            self.subscribe_astral_time(listener, astral_or_cron, topic)
         elif TimeUtils.is_cron_time_syntax(astral_or_cron):
             self.subscribe_cron(listener, astral_or_cron, topic)
         else:
             raise ConfigException(f"No astral nor cron format ('{astral_or_cron}'; worker: {listener.name})!")
 
-    def subscribe_astral_times(self, listener: DispatcherListener, astral_key: str, topic: str):
+    def subscribe_astral_time(self, listener: DispatcherListener, astral_key: str, topic: str):
         if not self._astral_time_manager.is_valid_astral_time_key(astral_key):
             raise ConfigException(f"wrong astral format ('{astral_key}'; worker: {listener.name})!")
 
