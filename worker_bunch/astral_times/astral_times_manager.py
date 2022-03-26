@@ -7,6 +7,7 @@ import astral.sun
 import attr
 
 from worker_bunch.astral_times.astral_times_config import AstralTime, AstralTimesConfKey
+from worker_bunch.service_config import ConfigException
 from worker_bunch.time_utils import TimeUtils
 
 
@@ -71,6 +72,9 @@ class AstralTimesManager:
             self._reset_cache(pivot_time)
         astral_time = self._cached_values.get(astral_key)
         if astral_time is None:
+            if not self._observer:
+                raise ConfigException("Astral times are not configured - missing location!")
+
             parsed = self.parse_astral_time_key(astral_key)
             astral_time = self.calc_astral_time(parsed, pivot_time, self._observer)
             self._cached_values[astral_key] = astral_time
