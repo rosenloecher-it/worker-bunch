@@ -57,7 +57,7 @@ class AstralTimesPublisher(Worker):
             self._mqtt_proxy.set_last_will(self._mqtt_topic_out, self._mqtt_last_will)
 
     def subscribe_notifications(self, dispatcher: Dispatcher):
-        dispatcher.subscribe_cron(self, "* 0 * * *", "cron-every-hour")
+        dispatcher.subscribe_cron(self, "0 0 * * *", "cron-every-hour")
 
     def _work(self, notifications: List[Notification]):
         found_message = next((n for n in notifications if n.type in [NotificationType.CRON, NotificationType.JUST_STARTED]), None)
