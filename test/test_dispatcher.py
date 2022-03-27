@@ -88,7 +88,7 @@ class TestDispatcher(unittest.TestCase):
         listener.add_notifications.assert_called_once_with(expected)
 
     # noinspection PyTypeChecker
-    @mock.patch("worker_bunch.time_utils.TimeUtils.now")
+    @mock.patch("worker_bunch.utils.time_utils.TimeUtils.now")
     def test_cron(self, mocked_now):
         time_start = datetime.datetime(2022, 1, 30, 10, 0, 0, tzinfo=get_localzone())
 

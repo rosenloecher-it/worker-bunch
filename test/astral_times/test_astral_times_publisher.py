@@ -45,7 +45,7 @@ class TestAstralTimesPublisher(unittest.TestCase):
         self.mqtt_proxy = mock.MagicMock(MqttProxy, autospec=True)
         self.worker._mqtt_proxy = self.mqtt_proxy
 
-    @mock.patch("worker_bunch.time_utils.TimeUtils.now")
+    @mock.patch("worker_bunch.utils.time_utils.TimeUtils.now")
     def test_round_trip(self, mocked_now):
         now = datetime(2022, 3, 19, 9, 55, 15, tzinfo=timezone(timedelta(seconds=3600)))
         mocked_now.return_value = now

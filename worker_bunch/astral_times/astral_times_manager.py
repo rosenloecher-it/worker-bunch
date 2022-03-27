@@ -8,7 +8,7 @@ import attr
 
 from worker_bunch.astral_times.astral_times_config import AstralTime, AstralTimesConfKey
 from worker_bunch.service_config import ConfigException
-from worker_bunch.time_utils import TimeUtils
+from worker_bunch.utils.time_utils import TimeUtils
 
 
 @attr.define

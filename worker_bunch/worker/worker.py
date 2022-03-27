@@ -12,7 +12,7 @@ from worker_bunch.mqtt.mqtt_proxy import MqttProxy
 from worker_bunch.notification import Notification
 from worker_bunch.service_config import ConfigException
 from worker_bunch.service_logging import ServiceLogging
-from worker_bunch.time_utils import TimeUtils
+from worker_bunch.utils.time_utils import TimeUtils
 
 
 class ShutdownException(Exception):

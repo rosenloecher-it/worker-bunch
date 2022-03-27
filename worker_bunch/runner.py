@@ -8,7 +8,7 @@ from typing import List, Optional
 from worker_bunch.dispatcher import Dispatcher
 from worker_bunch.mqtt.mqtt_proxy import MqttProxy
 from worker_bunch.notification import NotificationType
-from worker_bunch.time_utils import TimeUtils
+from worker_bunch.utils.time_utils import TimeUtils
 from worker_bunch.worker.worker import Worker
 
 _logger = logging.getLogger(__name__)

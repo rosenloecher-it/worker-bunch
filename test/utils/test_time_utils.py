@@ -3,7 +3,7 @@ import unittest
 
 from tzlocal import get_localzone
 
-from worker_bunch.time_utils import TimeUtils
+from worker_bunch.utils.time_utils import TimeUtils
 
 
 class TestTimeUtils(unittest.TestCase):

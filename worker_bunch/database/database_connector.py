@@ -9,7 +9,7 @@ from tzlocal import get_localzone
 
 from worker_bunch.database.database_config import DatabaseConfKey
 from worker_bunch.service_logging import ServiceLogging
-from worker_bunch.time_utils import TimeUtils
+from worker_bunch.utils.time_utils import TimeUtils
 
 
 class DatabaseException(Exception):

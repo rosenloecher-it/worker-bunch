@@ -16,7 +16,7 @@ from worker_bunch.dispatcher import Dispatcher
 from worker_bunch.mqtt.mqtt_client import MqttClient, MqttClientFactory
 from worker_bunch.mqtt.mqtt_proxy import MqttProxy
 from worker_bunch.runner import Runner
-from worker_bunch.time_utils import TimeUtils
+from worker_bunch.utils.time_utils import TimeUtils
 from worker_bunch.worker.worker import Worker, WorkerSetup
 from worker_bunch.worker.worker_factory import WorkerFactory
 

@@ -13,7 +13,7 @@ from worker_bunch.database.database_utils import DatabaseUtils
 from worker_bunch.dispatcher import Dispatcher
 from worker_bunch.notification import Notification, NT
 from worker_bunch.service_config import ConfigException
-from worker_bunch.time_utils import TimeUtils
+from worker_bunch.utils.time_utils import TimeUtils
 from worker_bunch.worker.worker import Worker, WorkerSetup
 
 

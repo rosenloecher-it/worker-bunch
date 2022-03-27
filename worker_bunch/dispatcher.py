@@ -13,7 +13,7 @@ from rx.disposable import Disposable
 from worker_bunch.astral_times.astral_times_manager import AstralTimesManager
 from worker_bunch.notification import Notification, NotificationType, NotificationBucket
 from worker_bunch.service_config import ConfigException
-from worker_bunch.time_utils import TimeUtils
+from worker_bunch.utils.time_utils import TimeUtils
 
 
 _logger = logging.getLogger(__name__)
