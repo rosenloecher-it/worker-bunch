@@ -33,6 +33,8 @@ class Worker(threading.Thread, DispatcherListener):
     def __init__(self, name: str):
         threading.Thread.__init__(self, name=name)
 
+        self._setup_done = False
+
         self._lock = threading.Lock()
         self._closing = False  # shutdown in process
         self._base_data_dir: Optional[str] = None
@@ -52,6 +54,10 @@ class Worker(threading.Thread, DispatcherListener):
 
     def setup(self, props: Dict[WorkerSetup, any]):
         with self._lock:
+            if self._setup_done:
+                raise RuntimeError(f"Setup only once ('{self.name}')!")
+            self._setup_done = True
+
             self._base_data_dir = props.get(WorkerSetup.BASE_DATA_DIR)
             worker_settings = props.get(WorkerSetup.WORKER_SETTINGS)
             self._worker_settings = copy.deepcopy(worker_settings) if worker_settings else {}
