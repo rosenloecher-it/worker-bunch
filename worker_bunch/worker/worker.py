@@ -59,7 +59,7 @@ class Worker(threading.Thread, DispatcherListener):
 
     def ensure_data_path(self, file_name: Optional[str] = None) -> str:
         if not self._base_data_dir:
-            raise ConfigException("No data dir configured!")
+            raise ConfigException(f"No data dir configured (but expected by '{self.name}')!")
         data_path = os.path.join(self._base_data_dir, self.name)  # base dir + worker name
         os.makedirs(data_path, exist_ok=True)
         if file_name:
