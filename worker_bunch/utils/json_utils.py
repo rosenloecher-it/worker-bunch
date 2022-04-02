@@ -13,5 +13,5 @@ class JsonUtils:
         raise TypeError(f"Type '{type(obj)}' is not JSON serializable!")
 
     @classmethod
-    def dumps(cls, data) -> str:
-        return json.dumps(data, sort_keys=True, default=cls._default_json_serial)
+    def dumps(cls, data, sort_keys=True, indent=None) -> str:
+        return json.dumps(data, indent=indent, sort_keys=sort_keys, default=cls._default_json_serial)
