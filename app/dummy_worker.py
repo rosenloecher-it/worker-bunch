@@ -4,7 +4,7 @@ import schedule
 
 from worker_bunch.dispatcher import Dispatcher
 from worker_bunch.notification import Notification
-from worker_bunch.worker.worker import Worker
+from worker_bunch.worker.worker import Worker, WorkerSetup
 
 
 class DummyWorkerConfKey:
@@ -42,8 +42,8 @@ class DummyWorker(Worker):
         self._mqtt_topic_out = []
         self._mqtt_topics_in = ""
 
-    def setup(self, **kwargs):
-        super().setup(**kwargs)
+    def setup(self, props: Dict[WorkerSetup, any]):
+        super().setup(props)
 
         self._mqtt_last_will = self._worker_settings.get(DummyWorkerConfKey.MQTT_LAST_WILL)
         self._mqtt_retain = self._worker_settings.get(DummyWorkerConfKey.MQTT_RETAIN, False)
