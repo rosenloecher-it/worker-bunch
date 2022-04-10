@@ -57,6 +57,10 @@ class Notification:
         )
 
     @classmethod
+    def create_mqtt(cls, topic: str, payload: str):
+        return Notification(type=NotificationType.MQTT_MESSAGE, topic=topic, payload=cls.ensure_string(payload))
+
+    @classmethod
     def create_astral(cls, topic: str):
         return Notification(type=NotificationType.ASTRAL, topic=topic)
 
