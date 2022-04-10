@@ -10,7 +10,7 @@ with codecs.open(os.path.join(here, "README.md"), encoding="utf-8") as fh:
 # this grabs the requirements from requirements.txt
 install_requires = [i.strip() for i in open("requirements.txt").readlines()]
 
-VERSION = '0.1.4'
+VERSION = '0.8.0'
 DESCRIPTION = 'Tasks/jobs/rules engine, primarily intended for use in a smarthome environment.'
 
 # Setting up
@@ -26,11 +26,11 @@ setup(
     packages=find_packages(),
     url='https://github.com/rosenloecher-it/worker-bunch',
     version=VERSION,
-    classifiers=[
+    classifiers=[  # https://pypi.org/classifiers/
         "Development Status :: 4 - Beta",
         "Environment :: Console",
         "Intended Audience :: Developers",
-        "Operating System :: Unix",
+        "Operating System :: POSIX :: Linux",
         "Programming Language :: Python :: 3",
         'License :: OSI Approved :: MIT License',
     ]
