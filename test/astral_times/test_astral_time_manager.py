@@ -88,6 +88,13 @@ class TestAstralTimeManager(unittest.TestCase):
             AstralParsed(predefined=AstralTime.SUNRISE)
         )
 
+    def test_get_location(self):
+        m = AstralTimesManager(self.DUMMY_CONFIG)
+        location = m.get_location()
+        self.assertEqual(location.latitude, self.DUMMY_CONFIG[AstralTimesConfKey.LATITUDE])
+        self.assertEqual(location.longitude, self.DUMMY_CONFIG[AstralTimesConfKey.LONGITUDE])
+        self.assertEqual(location.elevation, self.DUMMY_CONFIG[AstralTimesConfKey.ELEVATION])
+
     def test_get_astral_time(self):
         m = AstralTimesManager(self.DUMMY_CONFIG)
         now = datetime(2022, 3, 19, 7, 55, 15, tzinfo=timezone(timedelta(seconds=3600)))

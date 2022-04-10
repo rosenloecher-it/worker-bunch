@@ -1,5 +1,6 @@
 import copy
 import datetime
+from collections import namedtuple
 from typing import List, Optional, Dict
 
 import astral
@@ -43,6 +44,9 @@ class AstralParsed:
         return True
 
 
+Location = namedtuple("Location", ["latitude", "longitude", "elevation"])
+
+
 class AstralTimesManager:
     """
     Provides astral times for the configured location (latitude, longitude, altitude).
@@ -62,6 +66,12 @@ class AstralTimesManager:
         self._cached_values: Dict[str, datetime.datetime] = {}
 
         self._reset_cache(self._cache_time)
+
+    def get_location(self) -> Optional[Location]:
+        """Returns configured location"""
+        if not self._observer:
+            return None
+        return Location(latitude=self._observer.latitude, longitude=self._observer.longitude, elevation=self._observer.elevation)
 
     def _reset_cache(self, cache_time):
         self._cached_values = {}
