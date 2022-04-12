@@ -20,7 +20,7 @@ class ShutdownException(Exception):
 
 
 class WorkerSetup(Enum):
-    """keys used in Worker.setup kwargs"""
+    """keys used in `Worker.setup` kwargs"""
     ASTRAL_TIME_MANAGER = "astral_time_manager"
     BASE_DATA_DIR = "base_data_dir"
     DATABASE_MANAGER = "database_manager"

@@ -44,9 +44,9 @@ class WorkerFactory:
         workers = {}
         for worker_name, class_path in config.items():
 
-            predefinded_class_pathes = cls.PREDEFINED_WORKERS.get(class_path)
-            if predefinded_class_pathes:
-                class_path = predefinded_class_pathes
+            predefined_class_paths = cls.PREDEFINED_WORKERS.get(class_path)
+            if predefined_class_paths:
+                class_path = predefined_class_paths
 
             if worker_name and class_path:
                 workers[worker_name] = cls.create_worker(worker_name, class_path)

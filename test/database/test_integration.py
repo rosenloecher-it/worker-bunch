@@ -67,7 +67,6 @@ class BaseTestIntegration(unittest.TestCase):
     def create_steps(self):
         raise NotImplementedError()
 
-    @abc.abstractmethod
     def create_worker_replacements(self):
         return None
 

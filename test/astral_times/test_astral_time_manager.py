@@ -55,6 +55,7 @@ class TestAstralTimeManager(unittest.TestCase):
         self.assertEqual(AstralParsed(is_dusk=True).is_valid(), False)
         self.assertEqual(AstralParsed(is_dusk=True, depression=0).is_valid(), False)
 
+    # noinspection SpellCheckingInspection
     def test_parse_astral_time_key(self):
 
         with self.assertRaises(ValueError):
@@ -142,6 +143,7 @@ class TestAstralTimeManager(unittest.TestCase):
         self.assertEqual(hit, True)
         self.assertEqual(len(m._cached_values), 1)
 
+        # noinspection SpellCheckingInspection
         hit = m.hits(" sunrisE ", t_sunrise)
         self.assertEqual(hit, True)
         self.assertEqual(len(m._cached_values), 2)

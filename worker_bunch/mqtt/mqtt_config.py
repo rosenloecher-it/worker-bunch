@@ -23,7 +23,7 @@ MQTT_JSONSCHEMA = {
         MqttConfKey.DEFAULT_QOS: {"type": "integer", "enum": [0, 1, 2]},
         MqttConfKey.DEFAULT_RETAIN: {
             "type": "boolean",
-            "description": "Default: True. May be overwriten in yout worker."},
+            "description": "Default: True. May be overwritten in your worker."},
         MqttConfKey.HOST: {"type": "string", "minLength": 1},
         MqttConfKey.KEEPALIVE: {
             "type": "integer",

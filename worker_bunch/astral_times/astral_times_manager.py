@@ -202,6 +202,6 @@ class AstralTimesManager:
         if astral_time is None and parsed.is_dusk and parsed.depression is not None:
             astral_time = astral.sun.dusk(observer, date, parsed.depression, pivot_time.tzinfo)
 
-        # if astral_time is None, than parsed.is_valid() has failed
+        # if astral_time is None, then parsed.is_valid() has failed
         astral_time = cls.round_time_to_minute(astral_time)
         return astral_time

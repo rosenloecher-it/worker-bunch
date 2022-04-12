@@ -24,6 +24,7 @@ class TestStep(unittest.TestCase):
         with open(file, 'w') as f:
             f.write(content)
 
+    # noinspection SpellCheckingInspection
     def test_load_script_file(self):
         text_in = "\nabc \n gäüßhh\n\n"
         self.write_script_file(self.script_file, text_in)
