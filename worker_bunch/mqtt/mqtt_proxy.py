@@ -36,6 +36,10 @@ class MqttProxy:
             else:
                 return True  # hide missing mqtt client
 
+    def ensure_connection(self):
+        if self._mqtt_client:
+            self._mqtt_client.ensure_connection()
+
     def set_last_will(self, topic: str, last_will: Union[str, Dict], retain: Optional[bool] = None):
         if not self._mqtt_client:
             raise ConfigException("no mqtt client configured!")

@@ -92,6 +92,7 @@ class Runner:
         while True:
             self._mqtt_proxy.publish()
 
+            self._mqtt_proxy.ensure_connection()
             messages = self._mqtt_proxy.get_messages()
             self._dispatcher.push_mqtt_messages(messages)
 
