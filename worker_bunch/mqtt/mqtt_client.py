@@ -125,6 +125,8 @@ class MqttClient:
             retain=retain
         )
 
+        _logger.debug("set last will: topic='%s'; retain=%s; qos=%d; last_will='%s'", topic, retain, qos, last_will)
+
     def get_messages(self) -> List[mqtt.MQTTMessage]:
         with self._lock:
             messages = self._messages
@@ -145,7 +147,7 @@ class MqttClient:
             retain=retain
         )
 
-        _logger.debug("sent - topic: '%s' | payload: '%s'", topic, payload)
+        _logger.debug("sent: topic='%s'; retain=%s; qos=%d; payload='%s'", topic, retain, qos, payload)
 
         return result
 
