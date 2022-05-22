@@ -129,6 +129,26 @@ class TestAstralTimeManager(unittest.TestCase):
         }
         self.assertEqual(astral_times, expected_times)
 
+    def test_get_astral_times_invalid(self):
+        m = AstralTimesManager(self.DUMMY_CONFIG)
+        now = datetime(2022, 6, 21, 9, 55, 15, tzinfo=timezone(timedelta(seconds=3600)))
+        astral_times = m.get_astral_times(now)
+
+        expected_times = {
+            'dawn_astro': datetime(2022, 6, 21, 1, 46, tzinfo=timezone(timedelta(seconds=3600))),
+            'dawn_civil': datetime(2022, 6, 21, 2, 59, tzinfo=timezone(timedelta(seconds=3600))),
+            'dawn_nautical': None,
+            'dusk_astro': datetime(2022, 6, 21, 22, 28, tzinfo=timezone(timedelta(seconds=3600))),
+            'dusk_civil': datetime(2022, 6, 21, 21, 14, tzinfo=timezone(timedelta(seconds=3600))),
+            'dusk_nautical': None,
+            'midnight': datetime(2022, 6, 21, 0, 7, tzinfo=timezone(timedelta(seconds=3600))),
+            'noon': datetime(2022, 6, 21, 12, 7, tzinfo=timezone(timedelta(seconds=3600))),
+            'sunrise': datetime(2022, 6, 21, 3, 47, tzinfo=timezone(timedelta(seconds=3600))),
+            'sunset': datetime(2022, 6, 21, 20, 26, tzinfo=timezone(timedelta(seconds=3600))),
+            'timestamp': datetime(2022, 6, 21, 9, 55, 15, tzinfo=timezone(timedelta(seconds=3600)))
+        }
+        self.assertEqual(astral_times, expected_times)
+
     def test_hits(self):
         m = AstralTimesManager(self.DUMMY_CONFIG)
         t_no_hit = datetime(2022, 3, 19, 9, 55, 15, tzinfo=timezone(timedelta(seconds=3600)))

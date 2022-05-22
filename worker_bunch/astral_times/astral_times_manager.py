@@ -115,7 +115,11 @@ class AstralTimesManager:
 
         for astral_time in AstralTime:
             recipe = AstralParsed(predefined=astral_time)
-            data[astral_time.value] = self.calc_astral_time(recipe, time, self._observer)
+            try:
+                data[astral_time.value] = self.calc_astral_time(recipe, time, self._observer)
+            except ValueError:
+                # ValueError: Sun never reaches 18 degrees below the horizon, at this location.
+                data[astral_time.value] = None
 
         return data
 
