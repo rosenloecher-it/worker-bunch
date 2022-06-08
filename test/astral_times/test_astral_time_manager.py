@@ -149,6 +149,64 @@ class TestAstralTimeManager(unittest.TestCase):
         }
         self.assertEqual(astral_times, expected_times)
 
+    def test_get_astral_times_extented_invalid(self):
+        m = AstralTimesManager(self.DUMMY_CONFIG)
+        now = datetime(2022, 6, 21, 9, 55, 15, tzinfo=timezone(timedelta(seconds=7200)))
+
+        keys = AstralTime.extended_values()
+
+        astral_times = {}
+
+        for key in keys:
+            astral_times[key] = m.get_astral_time(key, now)
+
+        self.assertEqual(astral_times, {
+            'dawn_10': datetime(2022, 6, 21, 3, 14, tzinfo=timezone(timedelta(seconds=7200))),
+            'dawn_11': datetime(2022, 6, 21, 3, 1, tzinfo=timezone(timedelta(seconds=7200))),
+            'dawn_12': datetime(2022, 6, 21, 2, 46, tzinfo=timezone(timedelta(seconds=7200))),
+            'dawn_13': datetime(2022, 6, 21, 2, 28, tzinfo=timezone(timedelta(seconds=7200))),
+            'dawn_14': datetime(2022, 6, 21, 2, 6, tzinfo=timezone(timedelta(seconds=7200))),
+            'dawn_15': datetime(2022, 6, 21, 1, 27, tzinfo=timezone(timedelta(seconds=7200))),
+            'dawn_16': None,
+            'dawn_17': None,
+            'dawn_18': None,
+            'dawn_2': datetime(2022, 6, 21, 4, 36, tzinfo=timezone(timedelta(seconds=7200))),
+            'dawn_3': datetime(2022, 6, 21, 4, 27, tzinfo=timezone(timedelta(seconds=7200))),
+            'dawn_4': datetime(2022, 6, 21, 4, 18, tzinfo=timezone(timedelta(seconds=7200))),
+            'dawn_5': datetime(2022, 6, 21, 4, 9, tzinfo=timezone(timedelta(seconds=7200))),
+            'dawn_6': datetime(2022, 6, 21, 3, 59, tzinfo=timezone(timedelta(seconds=7200))),
+            'dawn_7': datetime(2022, 6, 21, 3, 49, tzinfo=timezone(timedelta(seconds=7200))),
+            'dawn_8': datetime(2022, 6, 21, 3, 38, tzinfo=timezone(timedelta(seconds=7200))),
+            'dawn_9': datetime(2022, 6, 21, 3, 27, tzinfo=timezone(timedelta(seconds=7200))),
+            'dawn_astro': datetime(2022, 6, 21, 2, 46, tzinfo=timezone(timedelta(seconds=7200))),
+            'dawn_civil': datetime(2022, 6, 21, 3, 59, tzinfo=timezone(timedelta(seconds=7200))),
+            'dawn_nautical': None,
+            'dusk_10': datetime(2022, 6, 21, 22, 59, tzinfo=timezone(timedelta(seconds=7200))),
+            'dusk_11': datetime(2022, 6, 21, 23, 13, tzinfo=timezone(timedelta(seconds=7200))),
+            'dusk_12': datetime(2022, 6, 21, 23, 28, tzinfo=timezone(timedelta(seconds=7200))),
+            'dusk_13': datetime(2022, 6, 21, 23, 46, tzinfo=timezone(timedelta(seconds=7200))),
+            'dusk_14': datetime(2022, 6, 22, 0, 8, tzinfo=timezone(timedelta(seconds=7200))),
+            'dusk_15': datetime(2022, 6, 22, 0, 47, tzinfo=timezone(timedelta(seconds=7200))),
+            'dusk_16': None,
+            'dusk_17': None,
+            'dusk_18': None,
+            'dusk_2': datetime(2022, 6, 21, 21, 38, tzinfo=timezone(timedelta(seconds=7200))),
+            'dusk_3': datetime(2022, 6, 21, 21, 46, tzinfo=timezone(timedelta(seconds=7200))),
+            'dusk_4': datetime(2022, 6, 21, 21, 55, tzinfo=timezone(timedelta(seconds=7200))),
+            'dusk_5': datetime(2022, 6, 21, 22, 5, tzinfo=timezone(timedelta(seconds=7200))),
+            'dusk_6': datetime(2022, 6, 21, 22, 14, tzinfo=timezone(timedelta(seconds=7200))),
+            'dusk_7': datetime(2022, 6, 21, 22, 25, tzinfo=timezone(timedelta(seconds=7200))),
+            'dusk_8': datetime(2022, 6, 21, 22, 36, tzinfo=timezone(timedelta(seconds=7200))),
+            'dusk_9': datetime(2022, 6, 21, 22, 47, tzinfo=timezone(timedelta(seconds=7200))),
+            'dusk_astro': datetime(2022, 6, 21, 23, 28, tzinfo=timezone(timedelta(seconds=7200))),
+            'dusk_civil': datetime(2022, 6, 21, 22, 14, tzinfo=timezone(timedelta(seconds=7200))),
+            'dusk_nautical': None,
+            'midnight': datetime(2022, 6, 21, 1, 7, tzinfo=timezone(timedelta(seconds=7200))),
+            'noon': datetime(2022, 6, 21, 13, 7, tzinfo=timezone(timedelta(seconds=7200))),
+            'sunrise': datetime(2022, 6, 21, 4, 47, tzinfo=timezone(timedelta(seconds=7200))),
+            'sunset': datetime(2022, 6, 21, 21, 26, tzinfo=timezone(timedelta(seconds=7200))),
+        })
+
     def test_hits(self):
         m = AstralTimesManager(self.DUMMY_CONFIG)
         t_no_hit = datetime(2022, 3, 19, 9, 55, 15, tzinfo=timezone(timedelta(seconds=3600)))

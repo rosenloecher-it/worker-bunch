@@ -1,5 +1,6 @@
 import copy
 import datetime
+import logging
 from collections import namedtuple
 from typing import List, Optional, Dict
 
@@ -10,6 +11,9 @@ import attr
 from worker_bunch.astral_times.astral_times_config import AstralTime, AstralTimesConfKey
 from worker_bunch.service_config import ConfigException
 from worker_bunch.utils.time_utils import TimeUtils
+
+
+_logger = logging.getLogger(__name__)
 
 
 @attr.define
@@ -178,33 +182,38 @@ class AstralTimesManager:
         date = pivot_time.date()
         astral_time = None
 
-        if parsed.predefined == AstralTime.SUNRISE:
-            astral_time = astral.sun.sunrise(observer, date, pivot_time.tzinfo)
-        elif parsed.predefined == AstralTime.NOON:
-            astral_time = astral.sun.noon(observer, date, pivot_time.tzinfo)
-        elif parsed.predefined == AstralTime.SUNSET:
-            astral_time = astral.sun.sunset(observer, date, pivot_time.tzinfo)
-        elif parsed.predefined == AstralTime.MIDNIGHT:
-            astral_time = astral.sun.midnight(observer, date, pivot_time.tzinfo)
+        try:
+            if parsed.predefined == AstralTime.SUNRISE:
+                astral_time = astral.sun.sunrise(observer, date, pivot_time.tzinfo)
+            elif parsed.predefined == AstralTime.NOON:
+                astral_time = astral.sun.noon(observer, date, pivot_time.tzinfo)
+            elif parsed.predefined == AstralTime.SUNSET:
+                astral_time = astral.sun.sunset(observer, date, pivot_time.tzinfo)
+            elif parsed.predefined == AstralTime.MIDNIGHT:
+                astral_time = astral.sun.midnight(observer, date, pivot_time.tzinfo)
 
-        if astral_time is None and parsed.depression is None:
-            if parsed.predefined in [AstralTime.DAWN_CIVIL, AstralTime.DUSK_CIVIL]:
-                parsed.depression = 6
-            elif parsed.predefined in [AstralTime.DAWN_ASTRO, AstralTime.DUSK_ASTRO]:
-                parsed.depression = 12
-            elif parsed.predefined in [AstralTime.DAWN_NAUTICAL, AstralTime.DUSK_NAUTICAL]:
-                parsed.depression = 18
+            if astral_time is None and parsed.depression is None:
+                if parsed.predefined in [AstralTime.DAWN_CIVIL, AstralTime.DUSK_CIVIL]:
+                    parsed.depression = 6
+                elif parsed.predefined in [AstralTime.DAWN_ASTRO, AstralTime.DUSK_ASTRO]:
+                    parsed.depression = 12
+                elif parsed.predefined in [AstralTime.DAWN_NAUTICAL, AstralTime.DUSK_NAUTICAL]:
+                    parsed.depression = 18
 
-        if parsed.predefined in [AstralTime.DAWN_CIVIL, AstralTime.DAWN_ASTRO, AstralTime.DAWN_NAUTICAL]:
-            parsed.is_dawn = True
-        elif parsed.predefined in [AstralTime.DUSK_CIVIL, AstralTime.DUSK_ASTRO, AstralTime.DUSK_NAUTICAL]:
-            parsed.is_dusk = True
+            if parsed.predefined in [AstralTime.DAWN_CIVIL, AstralTime.DAWN_ASTRO, AstralTime.DAWN_NAUTICAL]:
+                parsed.is_dawn = True
+            elif parsed.predefined in [AstralTime.DUSK_CIVIL, AstralTime.DUSK_ASTRO, AstralTime.DUSK_NAUTICAL]:
+                parsed.is_dusk = True
 
-        if astral_time is None and parsed.is_dawn and parsed.depression is not None:
-            astral_time = astral.sun.dawn(observer, date, parsed.depression, pivot_time.tzinfo)
+            if astral_time is None and parsed.is_dawn and parsed.depression is not None:
+                astral_time = astral.sun.dawn(observer, date, parsed.depression, pivot_time.tzinfo)
 
-        if astral_time is None and parsed.is_dusk and parsed.depression is not None:
-            astral_time = astral.sun.dusk(observer, date, parsed.depression, pivot_time.tzinfo)
+            if astral_time is None and parsed.is_dusk and parsed.depression is not None:
+                astral_time = astral.sun.dusk(observer, date, parsed.depression, pivot_time.tzinfo)
+
+        except ValueError as ex:
+            _logger.warning(f"cannot get astral time ({parsed})! {ex}")
+            return None
 
         # if astral_time is None, then parsed.is_valid() has failed
         astral_time = cls.round_time_to_minute(astral_time)
