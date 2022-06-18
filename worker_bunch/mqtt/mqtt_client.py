@@ -48,6 +48,8 @@ class MqttClient:
         self._default_qos = config.get(MqttConfKey.DEFAULT_QOS, self.DEFAULT_QOS)
         self._default_retain = config.get(MqttConfKey.DEFAULT_RETAIN, self.DEFAULT_RETAIN)
 
+        self._debug_simulate_sending = config.get(MqttConfKey.DEBUG_SIMULATE_SENDING, False)
+
         protocol = config.get(MqttConfKey.PROTOCOL, self.DEFAULT_PROTOCOL)
         client_id = config.get(MqttConfKey.CLIENT_ID)
         ssl_ca_certs = config.get(MqttConfKey.SSL_CA_CERTS)
@@ -139,6 +141,10 @@ class MqttClient:
 
         retain = self._default_retain if retain is None else retain
         qos = self._default_qos if qos is None else qos
+
+        if self._debug_simulate_sending:
+            _logger.info("simulated sent: topic='%s'; retain=%s; qos=%d; payload='%s'", topic, retain, qos, payload)
+            return mqtt.MQTTMessageInfo(0)
 
         result = self._client.publish(
             topic=topic,

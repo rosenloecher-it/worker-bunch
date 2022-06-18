@@ -10,6 +10,8 @@ class MqttConfKey:
     DEFAULT_QOS = "default_qos"
     DEFAULT_RETAIN = "default_retain"
 
+    DEBUG_SIMULATE_SENDING = "debug_simulate_sending"
+
     SSL_CA_CERTS = "ssl_ca_certs"
     SSL_CERTFILE = "ssl_certfile"
     SSL_INSECURE = "ssl_insecure"
@@ -38,6 +40,8 @@ MQTT_JSONSCHEMA = {
         MqttConfKey.SSL_INSECURE: {"type": "boolean"},
         MqttConfKey.SSL_KEYFILE: {"type": "string", "minLength": 1},
         MqttConfKey.USER: {"type": "string", "minLength": 1},
+
+        MqttConfKey.DEBUG_SIMULATE_SENDING: {"type": "boolean", "description": "it True, no MQTT message is sent out!"},
     },
     "additionalProperties": False,
     "required": [MqttConfKey.HOST],
