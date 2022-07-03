@@ -49,6 +49,7 @@ class MqttClient:
         self._default_retain = config.get(MqttConfKey.DEFAULT_RETAIN, self.DEFAULT_RETAIN)
 
         self._debug_simulate_sending = config.get(MqttConfKey.DEBUG_SIMULATE_SENDING, False)
+        self._debug_topic_prefix = config.get(MqttConfKey.DEBUG_TOPIC_PREFIX)
 
         protocol = config.get(MqttConfKey.PROTOCOL, self.DEFAULT_PROTOCOL)
         client_id = config.get(MqttConfKey.CLIENT_ID)
@@ -141,6 +142,9 @@ class MqttClient:
 
         retain = self._default_retain if retain is None else retain
         qos = self._default_qos if qos is None else qos
+
+        if self._debug_topic_prefix:
+            topic = self._debug_topic_prefix + topic
 
         if self._debug_simulate_sending:
             _logger.info("simulated sent: topic='%s'; retain=%s; qos=%d; payload='%s'", topic, retain, qos, payload)

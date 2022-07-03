@@ -11,6 +11,7 @@ class MqttConfKey:
     DEFAULT_RETAIN = "default_retain"
 
     DEBUG_SIMULATE_SENDING = "debug_simulate_sending"
+    DEBUG_TOPIC_PREFIX = "debug_topic_prefix"
 
     SSL_CA_CERTS = "ssl_ca_certs"
     SSL_CERTFILE = "ssl_certfile"
@@ -42,6 +43,10 @@ MQTT_JSONSCHEMA = {
         MqttConfKey.USER: {"type": "string", "minLength": 1},
 
         MqttConfKey.DEBUG_SIMULATE_SENDING: {"type": "boolean", "description": "it True, no MQTT message is sent out!"},
+        MqttConfKey.DEBUG_TOPIC_PREFIX: {
+            "type": "string",
+            "description": "Put before the intented topic!"
+        },
     },
     "additionalProperties": False,
     "required": [MqttConfKey.HOST],
