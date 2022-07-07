@@ -115,6 +115,7 @@ class TestIntegrationScalar(BaseTestIntegration):
             DatabaseConfKey.STATEMENT: "SELECT COUNT(1) FROM %XXX%",
         }]
 
+    # noinspection PyUnresolvedReferences
     @mock.patch.object(MqttClientFactory, "create", MockMqttClientFactory.create)
     def test_full_integration_scalar(self):
         mocked_mqtt_client = MockMqttClientFactory.mock
@@ -160,6 +161,7 @@ class TestIntegrationJson(BaseTestIntegration):
     def create_worker_replacements(self):
         return self.worker_replacements
 
+    # noinspection PyUnresolvedReferences
     @mock.patch.object(MqttClientFactory, "create", MockMqttClientFactory.create)
     def test_full_integration_json(self):
         mocked_mqtt_client = MockMqttClientFactory.mock
@@ -197,6 +199,7 @@ class TestIntegrationFileNotFound(BaseTestIntegration):
     def create_steps(self):
         return self.steps
 
+    # noinspection PyUnresolvedReferences
     @mock.patch.object(MqttClientFactory, "create", MockMqttClientFactory.create)
     def test_full_integration_json(self):
         with self.assertRaises(ConfigException):
@@ -217,6 +220,7 @@ class TestIntegrationExecute(BaseTestIntegration):
             })
         return steps
 
+    # noinspection PyUnresolvedReferences
     @mock.patch.object(MqttClientFactory, "create", MockMqttClientFactory.create)
     def test_full_integration_execute(self):
         mocked_mqtt_client = MockMqttClientFactory.mock
