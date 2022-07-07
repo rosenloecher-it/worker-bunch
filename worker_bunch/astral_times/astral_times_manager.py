@@ -141,13 +141,13 @@ class AstralTimesManager:
 
         value = value.strip().lower()
         for astral_time in AstralTime:
-            if astral_time.value == value:
+            if astral_time.value.lower() == value:
                 return AstralParsed(predefined=astral_time)
 
         is_dawn = value.startswith("dawn")
         is_dusk = value.startswith("dusk")
         try:
-            depression = int(value[5:], 10)
+            depression = int(value[4:], 10)
         except ValueError:
             depression = None
 

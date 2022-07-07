@@ -9,17 +9,17 @@ _astral_extended_values: Optional[Set[str]] = None
 
 class AstralTime(Enum):
 
-    DAWN_ASTRO = "dawn_astro"
-    DAWN_NAUTICAL = "dawn_nautical"
-    DAWN_CIVIL = "dawn_civil"
+    DAWN_ASTRO = "dawnAstro"
+    DAWN_NAUTICAL = "dawnNautical"
+    DAWN_CIVIL = "dawnCivil"
 
     SUNRISE = "sunrise"
     NOON = "noon"
     SUNSET = "sunset"
 
-    DUSK_CIVIL = "dusk_civil"
-    DUSK_NAUTICAL = "dusk_nautical"
-    DUSK_ASTRO = "dusk_astro"
+    DUSK_CIVIL = "duskCivil"
+    DUSK_NAUTICAL = "duskNautical"
+    DUSK_ASTRO = "duskAstro"
 
     MIDNIGHT = "midnight"
 
@@ -51,8 +51,8 @@ class AstralTime(Enum):
         for astral_time in AstralTime:
             _astral_extended_values.add(astral_time.value)
         for i in range(2, 19):
-            _astral_extended_values.add(f"dawn_{i}")
-            _astral_extended_values.add(f"dusk_{i}")
+            _astral_extended_values.add(f"dawn{i}")
+            _astral_extended_values.add(f"dusk{i}")
 
 
 class AstralTimesConfKey:
