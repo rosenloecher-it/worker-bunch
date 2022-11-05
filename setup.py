@@ -10,8 +10,8 @@ with codecs.open(os.path.join(here, "README.md"), encoding="utf-8") as fh:
 # this grabs the requirements from requirements.txt
 install_requires = [i.strip() for i in open("requirements.txt").readlines()]
 
-VERSION = '0.8.4'
-DESCRIPTION = 'Tasks/jobs/rules engine, primarily intended for use in a smarthome environment.'
+VERSION = '1.0.1'
+DESCRIPTION = 'Task/job/rule engine, primarily intended for use in a smarthome environment.'
 
 # Setting up
 setup(
