@@ -160,7 +160,7 @@ class TestAstralTimeManager(unittest.TestCase):
         for key in keys:
             astral_times[key] = m.get_astral_time(key, now)
 
-        self.assertEqual(astral_times, {
+        self.assertEqual({
             'dawn10': datetime(2022, 6, 21, 3, 14, tzinfo=timezone(timedelta(seconds=7200))),
             'dawn11': datetime(2022, 6, 21, 3, 1, tzinfo=timezone(timedelta(seconds=7200))),
             'dawn12': datetime(2022, 6, 21, 2, 46, tzinfo=timezone(timedelta(seconds=7200))),
@@ -205,7 +205,7 @@ class TestAstralTimeManager(unittest.TestCase):
             'noon': datetime(2022, 6, 21, 13, 7, tzinfo=timezone(timedelta(seconds=7200))),
             'sunrise': datetime(2022, 6, 21, 4, 47, tzinfo=timezone(timedelta(seconds=7200))),
             'sunset': datetime(2022, 6, 21, 21, 26, tzinfo=timezone(timedelta(seconds=7200))),
-        })
+        }, astral_times)
 
     def test_hits(self):
         m = AstralTimesManager(self.DUMMY_CONFIG)
