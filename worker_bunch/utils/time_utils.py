@@ -42,3 +42,7 @@ class TimeUtils:
             return True
         except ValueError:
             return False
+
+    @classmethod
+    def iso_tz(cls, value):
+        return value.astimezone().isoformat()

@@ -61,3 +61,7 @@ class TestTimeUtils(unittest.TestCase):
             expected_hit = now.hour == 0 and now.minute == 0
             self.assertEqual(result_hit, expected_hit)
             now = now + datetime.timedelta(seconds=45, microseconds=434)
+
+    def test_iso_tz(self):
+        t1 = datetime.datetime(2022, 1, 29, 10, 1, 30, tzinfo=datetime.timezone(datetime.timedelta(seconds=3600)))
+        self.assertEqual("2022-01-29T10:01:30+01:00", TimeUtils.iso_tz(t1))
