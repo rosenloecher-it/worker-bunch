@@ -1,8 +1,6 @@
 import abc
 import datetime
 import logging
-from logging import Logger
-from typing import Optional
 
 import psycopg
 from tzlocal import get_localzone
@@ -22,11 +20,11 @@ class DatabaseConnector(abc.ABC):
 
         self._context_name = context_name
         self._connection_key = connection_key
-        self.__logger = None  # type: Optional[Logger]
+        self.__logger: logging.Logger = None
 
         self._connection = None
         self._auto_commit = config.get(DatabaseConfKey.AUTO_COMMIT, False)
-        self._last_connect_time = None  # type: Optional[datetime.datetime]
+        self._last_connect_time: datetime.datetime = None
 
         # configuration
         self._connect_data = {

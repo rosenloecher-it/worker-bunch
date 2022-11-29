@@ -3,7 +3,7 @@ import logging
 import signal
 import threading
 from asyncio import Task
-from typing import List, Optional
+from typing import List
 
 from worker_bunch.dispatcher import Dispatcher
 from worker_bunch.mqtt.mqtt_proxy import MqttProxy
@@ -26,7 +26,7 @@ class Runner:
         self._workers = workers
 
         self._loop = asyncio.get_event_loop()
-        self._main_task = None  # type: Optional[Task]
+        self._main_task: Task = None
 
         if threading.current_thread() is threading.main_thread():
             # integration tests may run the service in a thread...
