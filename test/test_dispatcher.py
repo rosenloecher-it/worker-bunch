@@ -99,7 +99,8 @@ class TestDispatcher(unittest.TestCase):
         listener = mock.MagicMock("listener")
         listener.add_notifications = mock.MagicMock("listener")
 
-        self.dispatcher.subscribe_cron(listener, "* * * * *", "cron-trigger")
+        self.dispatcher.subscribe_cron(listener, "* * * * *", "cron-trigger-1")
+        self.dispatcher.subscribe_cron(listener, "* * * * *", "cron-trigger-2")
 
         self.dispatcher.trigger_timers()
         listener.add_notifications.assert_not_called()
@@ -112,5 +113,8 @@ class TestDispatcher(unittest.TestCase):
         mocked_now.return_value = time_start + datetime.timedelta(seconds=65)
         self.dispatcher.trigger_timers()
 
-        expected = {Notification.create_cron("cron-trigger")}
+        expected = {
+            Notification.create_cron("cron-trigger-1"),
+            Notification.create_cron("cron-trigger-2")
+        }
         listener.add_notifications.assert_called_once_with(expected)
