@@ -165,6 +165,8 @@ def run_service(config_file, log_file, log_level, print_log_console, skip_log_ti
             worker.set_last_will()  # before set_mqtt_proxy ("last will" depends on config)!
 
         # start
+        _logger.info("start")
+
         runner = Runner(dispatcher, mqtt_proxy, workers)
         if test_single:
             runner.run_single()
