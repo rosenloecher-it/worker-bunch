@@ -98,7 +98,7 @@ class AstralTimesManager:
     def hits(self, astral_key: str, pivot_time: Optional[datetime.datetime] = None) -> List[str]:
         if pivot_time is None:
             pivot_time = TimeUtils.now()
-        pivot_time = self.round_time_to_minute(pivot_time)
+        pivot_time = self.cast_time_to_minute(pivot_time)
 
         astral_time = self._get_or_calc_astral_time(astral_key, pivot_time)
         return astral_time == pivot_time
@@ -106,7 +106,7 @@ class AstralTimesManager:
     def get_astral_time(self, astral_key: str, pivot_time: Optional[datetime.datetime] = None) -> datetime.datetime:
         if pivot_time is None:
             pivot_time = TimeUtils.now()
-        pivot_time = self.round_time_to_minute(pivot_time)
+        pivot_time = self.cast_time_to_minute(pivot_time)
 
         astral_time = self._get_or_calc_astral_time(astral_key, pivot_time)
         return astral_time
@@ -160,15 +160,12 @@ class AstralTimesManager:
         raise ValueError(f"no valid AstralParse value ({value})!")
 
     @classmethod
-    def round_time_to_minute(cls, time: datetime.datetime) -> datetime.datetime:
-        time = time + datetime.timedelta(seconds=30)
-        time = time.replace(second=0)
-        time = time.replace(microsecond=0)
-        return time
+    def cast_time_to_minute(cls, time: datetime.datetime) -> datetime.datetime:
+        return time.replace(second=0, microsecond=0)
 
     @classmethod
     def round_time_to_hour(cls, time: datetime.datetime) -> datetime.datetime:
-        time = cls.round_time_to_minute(time)
+        time = cls.cast_time_to_minute(time)
         time = time.replace(minute=0)
         return time
 
@@ -216,5 +213,5 @@ class AstralTimesManager:
             return None
 
         # if astral_time is None, then parsed.is_valid() has failed
-        astral_time = cls.round_time_to_minute(astral_time)
+        astral_time = cls.cast_time_to_minute(astral_time)
         return astral_time
