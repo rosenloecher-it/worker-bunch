@@ -7,6 +7,7 @@ import schedule
 from paho.mqtt.client import MQTTMessage
 from tzlocal import get_localzone
 
+from worker_bunch.astral_times.astral_times_manager import AstralTimesManager
 from worker_bunch.dispatcher import Dispatcher, DispatcherListener, TopicMatch
 from worker_bunch.notification import Notification
 
@@ -116,5 +117,45 @@ class TestDispatcher(unittest.TestCase):
         expected = {
             Notification.create_cron("cron-trigger-1"),
             Notification.create_cron("cron-trigger-2")
+        }
+        listener.add_notifications.assert_called_once_with(expected)
+
+
+class TestDispatcherWithRealAstralTimeManager(unittest.TestCase):
+
+    def setUp(self):
+        self.astral_times_manager = AstralTimesManager({
+            "latitude": 52.5162,
+            "longitude": 13.3777,
+            "elevation": 100,
+        })
+        self.dispatcher = Dispatcher(self.astral_times_manager)
+
+    # noinspection PyTypeChecker
+    @mock.patch("worker_bunch.utils.time_utils.TimeUtils.now")
+    def test_astral_times(self, mocked_now):
+        tz = datetime.timezone(datetime.timedelta(seconds=3600))
+        time_start = datetime.datetime(2022, 12, 13, 16, 0, tzinfo=tz)
+
+        # self.astral_times_manager.get_astral_time("dusk3", time_start): 2022-12-13 16:13:00+01:00
+
+        self.dispatcher._last_timer_execution = time_start
+
+        mocked_now.return_value = time_start
+
+        listener = mock.MagicMock("listener")
+        listener.add_notifications = mock.MagicMock("listener")
+
+        self.dispatcher.subscribe_astral_time(listener, "dusk3", "astral-trigger")
+
+        self.dispatcher.trigger_timers()
+        listener.add_notifications.assert_not_called()
+
+
+        mocked_now.return_value = datetime.datetime(2022, 12, 13, 16, 13, 59, tzinfo=tz)
+        self.dispatcher.trigger_timers()
+
+        expected = {
+            Notification.create_astral("astral-trigger"),
         }
         listener.add_notifications.assert_called_once_with(expected)

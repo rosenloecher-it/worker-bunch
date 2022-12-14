@@ -39,6 +39,13 @@ class TopicMatch:
 
 
 @attr.frozen
+class AstralSubscription:
+    astral_key: str
+    topic: str
+    listener: DispatcherListener = attr.Factory(None)
+
+
+@attr.frozen
 class CronSubscription:
     cron: str
     topic: str
@@ -68,7 +75,7 @@ class Dispatcher:
         self._exact_topic_matches: Dict[str, TopicMatch] = {}
         self._wildcard_topic_matches: List[TopicMatch] = []
 
-        self._astral_subscriptions: Dict[str, TopicMatch] = {}
+        self._astral_subscriptions: Dict[str, List[AstralSubscription]] = {}
         self._timer_subscriptions: Set[DispatcherListener] = set()  # only to send SINGLE notifications
         self._cron_subscriptions: Dict[str, List[CronSubscription]] = {}
         self._observers: Dict[DispatcherListener, Optional[Observer]] = {}
@@ -155,11 +162,13 @@ class Dispatcher:
         if not self._astral_time_manager.is_valid_astral_time_key(astral_key):
             raise ConfigException(f"wrong astral format ('{astral_key}'; worker: {listener.name})!")
 
-        topic_match = self._astral_subscriptions.get(astral_key)
-        if topic_match is None:
-            topic_match = TopicMatch(topic=topic)
-            self._astral_subscriptions[astral_key] = topic_match
-        topic_match.listeners.add(listener)
+        subscriptions = self._astral_subscriptions.get(astral_key)
+        if subscriptions is None:
+            subscriptions = []
+            self._astral_subscriptions[astral_key] = subscriptions
+
+        subscription = AstralSubscription(astral_key, topic, listener)
+        subscriptions.append(subscription)
 
     def subscribe_cron(self, listener: DispatcherListener, cron: str, topic: str):
         try:
@@ -217,12 +226,12 @@ class Dispatcher:
                         self._store_notification(subscription.listener, notification)
                         send_to.add(subscription.listener)
 
-            for astral_key, topic_match in self._astral_subscriptions.items():
+            for astral_key, subscriptions in self._astral_subscriptions.items():
                 if self._astral_time_manager.hits(astral_key, now):
-                    notification = Notification(type=NotificationType.ASTRAL, topic=topic_match.topic, payload=None)
-                    for listener in topic_match.listeners:
-                        self._store_notification(listener, notification)
-                        send_to.add(listener)
+                    for subscription in subscriptions:
+                        notification = Notification(type=NotificationType.ASTRAL, topic=subscription.topic, payload=None)
+                        self._store_notification(subscription.listener, notification)
+                        send_to.add(subscription.listener)
 
             for listener in send_to:
                 self._send_notifications(listener)
