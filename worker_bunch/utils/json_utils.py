@@ -19,3 +19,10 @@ class JsonUtils:
     @classmethod
     def dumps(cls, data, sort_keys=True, indent=None) -> str:
         return json.dumps(data, indent=indent, sort_keys=sort_keys, default=cls._default_json_serial)
+
+    @classmethod
+    def loads_dict(cls, s):
+        data = json.loads(s)
+        if not isinstance(data, dict):
+            raise ValueError("dict expected!")
+        return data

@@ -20,3 +20,9 @@ class TestJsonUtils(unittest.TestCase):
         result_data = JsonUtils.dumps(original_data)
 
         self.assertEqual(result_data, expected_data)
+
+    def test_loads_dict(self):
+        self.assertEqual(JsonUtils.loads_dict('{"s": 1}'), {"s": 1})
+
+        with self.assertRaises(ValueError):
+            JsonUtils.loads_dict("4")
