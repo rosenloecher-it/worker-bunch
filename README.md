@@ -28,8 +28,16 @@ Other characteristics:
 
 ## Usage
 
-Have a look at  [Worker-Bunch-Sample](https://github.com/rosenloecher-it/worker-bunch-sample)
+Have a look in the [app directory](https://github.com/rosenloecher-it/worker-bunch/blob/master/app)
+or in the [separate Worker-Bunch-Sample repository](https://github.com/rosenloecher-it/worker-bunch-sample)
 
+Note, that the [PyPi packages](https://pypi.org/project/worker-bunch/) are no longer maintained.
+Install via git instead: 
+```bash
+# example
+pip install git+https://github.com/rosenloecher-it/worker-bunch.git@v1.0.5
+pip install https://github.com/rosenloecher-it/worker-bunch/archive/v1.0.5.tar.gz
+```
 
 ## Maintainer & License
 
