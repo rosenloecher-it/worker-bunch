@@ -151,7 +151,6 @@ class TestDispatcherWithRealAstralTimeManager(unittest.TestCase):
         self.dispatcher.trigger_timers()
         listener.add_notifications.assert_not_called()
 
-
         mocked_now.return_value = datetime.datetime(2022, 12, 13, 16, 13, 59, tzinfo=tz)
         self.dispatcher.trigger_timers()
 
